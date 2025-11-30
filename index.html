@@ -20,6 +20,7 @@
       max-width: 900px;
       width: 100%;
       padding: 20px;
+      position: relative;
     }
 
     h1, h2, h3 {
@@ -65,6 +66,19 @@
     button:active {
       transform: translateY(0px);
       box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Big PLAY button overrides */
+    #play-button {
+      font-size: 32px;
+      padding: 26px 60px;
+      border-radius: 999px;
+      background: #16a34a;
+      box-shadow: 0 10px 25px rgba(22, 163, 74, 0.5);
+    }
+
+    #play-button:hover {
+      background: #15803d;
     }
 
     .concepts {
@@ -114,35 +128,45 @@
 
     #game-area {
       position: relative;
-      height: 380px;
+      height: 360px;
       border-radius: 16px;
       background: linear-gradient(180deg, #e0f2fe, #fef9c3);
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+      touch-action: none; /* prevent scroll while dragging on iPad */
     }
 
     .flag {
       position: absolute;
-      top: -50px;
-      font-size: 44px; /* bigger flags */
+      top: -60px;
+      font-size: 52px;       /* bigger flags */
       pointer-events: none;
       user-select: none;
     }
 
     #basket {
       position: absolute;
-      bottom: 14px;
-      width: 110px;      /* bigger basket */
-      height: 60px;      /* bigger basket */
+      bottom: 18px;
+      width: 120px;          /* bigger basket */
+      height: 60px;
       border-radius: 999px;
       background: #f97316;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 40px;   /* bigger emoji */
+      font-size: 36px;       /* basket emoji slightly smaller than flags */
       color: #fff;
       box-shadow: 0 3px 8px rgba(124, 45, 18, 0.4);
-      touch-action: none; /* better for touch dragging */
+    }
+
+    #play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.25);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
     }
 
     #options-legend {
@@ -199,32 +223,63 @@
       color: #666;
     }
 
-    /* Big overlay PLAY button */
-    #game-overlay {
-      position: absolute;
+    /* Big CONGRATULATIONS overlay */
+    #congrats-overlay {
+      position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.35);
+      background: rgba(0, 0, 0, 0.45);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 10;
+      z-index: 999;
+      pointer-events: none;
     }
 
-    #big-play-button {
-      font-size: 24px;
-      padding: 14px 36px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 10px 25px rgba(34, 197, 94, 0.6);
+    .congrats-box {
+      background: white;
+      border-radius: 24px;
+      padding: 30px 40px;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      animation: pop 0.6s ease-out;
     }
 
-    #big-play-button:hover {
-      background: #16a34a;
+    .congrats-main {
+      font-size: 40px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #f97316, #facc15, #22c55e, #3b82f6);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .congrats-sub {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .congrats-emoji {
+      font-size: 32px;
+      animation: bounce 0.8s infinite alternate;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      70% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes bounce {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-6px); }
     }
 
     @media (max-width: 700px) {
       #game-area {
-        height: 340px;
+        height: 320px;
+      }
+      .congrats-main {
+        font-size: 32px;
       }
     }
   </style>
@@ -250,14 +305,14 @@
           <li><strong>Trade surplus</strong>: Exports &gt; imports.</li>
           <li><strong>FDI (Foreign Direct Investment)</strong>: Investment from foreign companies into a country.</li>
           <li><strong>Minimum wage</strong>: The lowest legal wage employers can pay workers.</li>
-          <li><strong>Big Mac Index</strong>: Compares the price of a McDonald’s Big Mac in different countries to measure purchasing power.</li>
+          <li><strong>Big Mac Index</strong>: Compares the price of a Big Mac in different countries to measure purchasing power.</li>
         </ul>
       </div>
 
       <h3>Choose Your Question Set</h3>
       <p style="text-align:center; font-size:14px;">
         Each set has 6 questions. You have <strong>3 minutes</strong> to finish.<br/>
-        Get <strong>3 or more correct</strong> to win a small gift 🎁 (in real life at the booth)!
+        Get <strong>3 or more correct</strong> to win a small gift 🎁 at the booth!
       </p>
 
       <div class="btn-row">
@@ -266,7 +321,7 @@
       </div>
 
       <p class="controls-hint">
-        Controls: On computer, move your <strong>mouse</strong>. On iPad, drag with your <strong>finger</strong>.
+        Controls: <strong>Desktop</strong> – drag with your mouse. <strong>iPad</strong> – drag with your finger.
       </p>
     </div>
 
@@ -281,8 +336,8 @@
 
       <div id="game-area">
         <div id="basket">🧺</div>
-        <div id="game-overlay">
-          <button id="big-play-button">PLAY</button>
+        <div id="play-overlay">
+          <button id="play-button">PLAY</button>
         </div>
       </div>
 
@@ -306,8 +361,17 @@
     </div>
   </div>
 
-  <!-- AUDIO ELEMENTS (you need to add these files to your repo) -->
-  <audio id="bg-music" src="bg-music.mp3" loop></audio>
+  <!-- Big CONGRATULATIONS overlay -->
+  <div id="congrats-overlay">
+    <div class="congrats-box">
+      <div class="congrats-main">🎉 CONGRATULATIONS! 🎉</div>
+      <div class="congrats-sub">You got enough correct answers to win!</div>
+      <div class="congrats-emoji">✨🎈🎊✨</div>
+    </div>
+  </div>
+
+  <!-- Audio elements (you need to upload these MP3 files to GitHub) -->
+  <audio id="bg-music" src="background-music.mp3" loop></audio>
   <audio id="applause-sound" src="applause.mp3"></audio>
 
   <script>
@@ -479,9 +543,9 @@
     const resultTitleEl = document.getElementById("result-title");
     const resultDetailEl = document.getElementById("result-detail");
     const giftMessageEl = document.getElementById("gift-message");
-    const gameOverlay = document.getElementById("game-overlay");
-    const bigPlayButton = document.getElementById("big-play-button");
-
+    const playOverlay = document.getElementById("play-overlay");
+    const playButton = document.getElementById("play-button");
+    const congratsOverlay = document.getElementById("congrats-overlay");
     const bgMusicEl = document.getElementById("bg-music");
     const applauseEl = document.getElementById("applause-sound");
 
@@ -495,7 +559,9 @@
     let questionActive = false;
     let basketX = 0;
     let audioCtx = null;
-    let currentSetNumber = 1;
+    let gameReadyToStart = false;
+
+    // For drag controls
     let isDragging = false;
 
     function resetGameState() {
@@ -509,39 +575,37 @@
       fallingFlags = [];
       questionActive = false;
       messageEl.textContent = "";
-      messageEl.className = "";
       optionsLegendEl.textContent = "";
       resultScreen.style.display = "none";
+      hideCongrats();
+      gameReadyToStart = false;
       updateTimerDisplay();
       updateScoreDisplay();
-      // clear flags from previous game
-      const oldFlags = gameArea.querySelectorAll(".flag");
-      oldFlags.forEach(f => f.remove());
-      gameOverlay.style.display = "flex"; // show PLAY
     }
 
     function startGame(setNumber) {
-      currentSetNumber = setNumber;
+      resetGameState();
       currentQuestions = setNumber === 1 ? SET1_QUESTIONS : SET2_QUESTIONS;
 
       introScreen.style.display = "none";
       gameScreen.style.display = "block";
 
-      resetGameState();
-
-      // Place basket in the center
+      // Place basket in the center (after layout)
       setTimeout(() => {
         const areaWidth = gameArea.clientWidth;
         basketX = (areaWidth - basket.offsetWidth) / 2;
         updateBasketPosition();
       }, 0);
-    }
 
-    function actuallyStartRound() {
-      // Start music on first PLAY (user gesture)
-      startBackgroundMusic();
-      startTimer();
-      loadQuestion();
+      // Set HUD texts
+      questionCounterEl.textContent = `Question 1 / ${currentQuestions.length}`;
+      questionTextEl.textContent = "Tap PLAY to start!";
+      messageEl.textContent = "";
+      optionsLegendEl.textContent = "";
+
+      // Show big PLAY overlay
+      playOverlay.style.display = "flex";
+      gameReadyToStart = true;
     }
 
     function startTimer() {
@@ -576,7 +640,6 @@
       });
       fallingFlags = [];
       messageEl.textContent = "";
-      messageEl.className = "";
       optionsLegendEl.textContent = "";
 
       if (currentIndex >= currentQuestions.length || timeLeft <= 0) {
@@ -607,17 +670,17 @@
         el.textContent = opt.flag;
         gameArea.appendChild(el);
 
-        const flagWidth = 44; // approx
+        const flagWidth = 52; // approx
         const x = Math.random() * (areaWidth - flagWidth - 20) + 10;
-        const speed = 0.6 + Math.random() * 0.9; // slower!
+        const speed = 0.7 + Math.random() * 0.8; // slower fall
 
         el.style.left = x + "px";
-        el.style.top = "-50px";
+        el.style.top = "-60px";
 
         fallingFlags.push({
           el,
           x,
-          y: -50,
+          y: -60,
           speed,
           isCorrect: index === q.correctIndex,
           option: opt
@@ -648,7 +711,7 @@
 
       // Remove flags that fall out of area
       fallingFlags = fallingFlags.filter(flag => {
-        if (flag.y > areaHeight) {
+        if (flag.y > areaHeight + 60) {
           if (flag.el && flag.el.parentNode) {
             flag.el.parentNode.removeChild(flag.el);
           }
@@ -717,20 +780,18 @@
       questionActive = false;
       clearInterval(animationInterval);
       animationInterval = null;
-      stopBackgroundMusic();
 
       resultScreen.style.display = "block";
+      resultTitleEl.textContent = "Game Over!";
+      resultDetailEl.textContent = `You answered ${score} out of ${currentQuestions.length} questions correctly.`;
 
       if (score >= 3) {
-        resultTitleEl.textContent = "🎉 CONGRATULATIONS! 🎉";
+        giftMessageEl.textContent = "🎁 You win a small gift!";
+        showCongrats();
         playApplause();
-        giftMessageEl.textContent = "You win a small gift! 🎁";
       } else {
-        resultTitleEl.textContent = "Good try!";
         giftMessageEl.textContent = "Keep trying! Get 3 or more correct next time to win a gift.";
       }
-
-      resultDetailEl.textContent = `You answered ${score} out of ${currentQuestions.length} questions correctly.`;
     }
 
     // ---------- BASKET MOVEMENT (mouse + touch) ----------
@@ -745,47 +806,30 @@
 
     function moveBasketToClientX(clientX) {
       const rect = gameArea.getBoundingClientRect();
-      const xInside = clientX - rect.left;
-      basketX = xInside - basket.offsetWidth / 2;
+      const x = clientX - rect.left - basket.offsetWidth / 2;
+      basketX = x;
       updateBasketPosition();
     }
 
-    // Mouse controls
-    gameArea.addEventListener("mousedown", (e) => {
+    gameArea.addEventListener("pointerdown", (e) => {
       isDragging = true;
       moveBasketToClientX(e.clientX);
     });
 
-    window.addEventListener("mouseup", () => {
+    gameArea.addEventListener("pointermove", (e) => {
+      if (!isDragging) return;
+      moveBasketToClientX(e.clientX);
+    });
+
+    gameArea.addEventListener("pointerup", () => {
       isDragging = false;
     });
 
-    gameArea.addEventListener("mousemove", (e) => {
-      if (isDragging) {
-        moveBasketToClientX(e.clientX);
-      }
-    });
-
-    // Touch controls (iPad / phone)
-    gameArea.addEventListener("touchstart", (e) => {
-      isDragging = true;
-      if (e.touches && e.touches[0]) {
-        moveBasketToClientX(e.touches[0].clientX);
-      }
-    }, { passive: false });
-
-    window.addEventListener("touchend", () => {
+    gameArea.addEventListener("pointerleave", () => {
       isDragging = false;
     });
 
-    gameArea.addEventListener("touchmove", (e) => {
-      if (isDragging && e.touches && e.touches[0]) {
-        e.preventDefault(); // prevent scrolling while playing
-        moveBasketToClientX(e.touches[0].clientX);
-      }
-    }, { passive: false });
-
-    // Optional: keep keyboard controls as backup
+    // Keep keyboard movement as backup (optional)
     window.addEventListener("keydown", (e) => {
       const step = 24;
       if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
@@ -797,20 +841,32 @@
       }
     });
 
-    // ---------- SOUND EFFECTS & MUSIC ----------
+    // ---------- SOUND EFFECTS ----------
 
-    function playBeep() {
+    function ensureAudioContext() {
       try {
         if (!audioCtx) {
           const AudioContext = window.AudioContext || window.webkitAudioContext;
           if (!AudioContext) return;
           audioCtx = new AudioContext();
+        } else if (audioCtx.state === "suspended") {
+          audioCtx.resume();
         }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    function playBeep() {
+      try {
+        ensureAudioContext();
+        if (!audioCtx) return;
+
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
 
         osc.type = "square";
-        osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
 
         gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
 
@@ -821,28 +877,34 @@
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
         osc.stop(audioCtx.currentTime + 0.15);
       } catch (e) {
-        // ignore if sound fails
+        // If sound fails, just ignore
       }
     }
 
-    function startBackgroundMusic() {
+    function playBackgroundMusic() {
       if (!bgMusicEl) return;
-      bgMusicEl.volume = 0.3;
+      bgMusicEl.volume = 0.35;
       bgMusicEl.play().catch(() => {
-        // autoplay might be blocked; nothing we can do
+        // browser may block autoplay; that's okay
       });
-    }
-
-    function stopBackgroundMusic() {
-      if (!bgMusicEl) return;
-      bgMusicEl.pause();
-      bgMusicEl.currentTime = 0;
     }
 
     function playApplause() {
       if (!applauseEl) return;
       applauseEl.currentTime = 0;
       applauseEl.play().catch(() => {});
+    }
+
+    function showCongrats() {
+      congratsOverlay.style.display = "flex";
+      // Hide after a few seconds
+      setTimeout(() => {
+        hideCongrats();
+      }, 3500);
+    }
+
+    function hideCongrats() {
+      congratsOverlay.style.display = "none";
     }
 
     // ---------- BUTTON HOOKUP ----------
@@ -852,18 +914,25 @@
 
     document.getElementById("play-again-set1").addEventListener("click", () => startGame(1));
     document.getElementById("play-again-set2").addEventListener("click", () => startGame(2));
-
     document.getElementById("back-to-intro").addEventListener("click", () => {
       clearInterval(timerInterval);
       clearInterval(animationInterval);
-      stopBackgroundMusic();
       introScreen.style.display = "block";
       gameScreen.style.display = "none";
+      hideCongrats();
+      if (bgMusicEl) {
+        bgMusicEl.pause();
+        bgMusicEl.currentTime = 0;
+      }
     });
 
-    bigPlayButton.addEventListener("click", () => {
-      gameOverlay.style.display = "none";
-      actuallyStartRound();
+    playButton.addEventListener("click", () => {
+      if (!gameReadyToStart) return;
+      playOverlay.style.display = "none";
+      ensureAudioContext();
+      playBackgroundMusic();
+      startTimer();
+      loadQuestion();
     });
   </script>
 </body>
