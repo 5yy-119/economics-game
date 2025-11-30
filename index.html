@@ -119,12 +119,13 @@
       background: linear-gradient(180deg, #e0f2fe, #fef9c3);
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+      touch-action: none; /* important for iPad dragging */
     }
 
     .flag {
       position: absolute;
-      top: -40px;
-      font-size: 34px;
+      top: -50px;
+      font-size: 44px;       /* bigger flags */
       pointer-events: none;
       user-select: none;
     }
@@ -132,14 +133,14 @@
     #basket {
       position: absolute;
       bottom: 14px;
-      width: 80px;
-      height: 40px;
+      width: 110px;          /* bigger basket */
+      height: 55px;
       border-radius: 999px;
       background: #f97316;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      font-size: 36px;       /* bigger emoji */
       color: #fff;
       box-shadow: 0 3px 8px rgba(124, 45, 18, 0.4);
     }
@@ -184,11 +185,14 @@
     #result-screen strong {
       display: block;
       margin-bottom: 4px;
+      font-size: 18px;
+      text-align: center;
     }
 
     .gift {
       margin-top: 4px;
       font-weight: 600;
+      text-align: center;
     }
 
     .controls-hint {
@@ -209,7 +213,7 @@
   <div class="container">
     <h1>The World’s Most</h1>
     <p class="subtitle">
-      Move the 🧺 basket left / right to collect the correct national flag before it falls!
+      Move the 🧺 basket to collect the correct national flag before it falls!
     </p>
 
     <!-- INTRO / CONCEPTS SCREEN -->
@@ -230,21 +234,20 @@
         </ul>
       </div>
 
-      <h3>How the Game Works</h3>
+      <h3>Choose Your Question Set</h3>
       <p style="text-align:center; font-size:14px;">
-        Each round has <strong>6 questions</strong> and lasts <strong>3 minutes</strong>.<br/>
-        <strong>1st attempt</strong>: Set 1 questions.<br/>
-        <strong>2nd attempt</strong>: Set 2 questions.<br/>
-        Then they keep alternating.<br/><br/>
-        Get <strong>3 or more correct</strong> to win a small gift 🎁 (in real life at the booth)!
+        Each set has 6 questions. You have <strong>3 minutes</strong> to finish.<br/>
+        Get <strong>3 or more correct</strong> to win a small gift 🎁!
       </p>
 
       <div class="btn-row">
-        <button id="start-game">Start Game</button>
+        <button id="start-set-1">Play Set 1</button>
+        <button id="start-set-2">Play Set 2</button>
       </div>
 
       <p class="controls-hint">
-        Controls: Use <strong>←</strong> and <strong>→</strong> arrow keys (or A / D) to move the basket.
+        Desktop: use <strong>mouse</strong> or <strong>arrow keys</strong>.  
+        iPad: move the basket with your <strong>finger</strong>.
       </p>
     </div>
 
@@ -269,7 +272,8 @@
         <span id="result-detail"></span>
         <div class="gift" id="gift-message"></div>
         <div class="btn-row" style="margin-top:10px; justify-content:flex-start;">
-          <button id="play-again">Play Again (Next Set)</button>
+          <button id="play-again-set1">Play Set 1 Again</button>
+          <button id="play-again-set2">Play Set 2 Again</button>
           <button id="back-to-intro">Back to Concepts</button>
         </div>
       </div>
@@ -425,7 +429,7 @@
         options: [
           { country: "United States", flag: "🇺🇸" },
           { country: "United Kingdom", flag: "🇬🇧" },
-          { country: "Philippines", flag: "🇵🇭" }, // correct (relative to others listed)
+          { country: "Philippines", flag: "🇵🇭" }, // correct
           { country: "Australia", flag: "🇦🇺" }
         ],
         correctIndex: 2,
@@ -459,10 +463,10 @@
     let fallingFlags = [];
     let questionActive = false;
     let basketX = 0;
-
     let audioCtx = null;
-    let bgMusicInterval = null;
-    let attemptCount = 0;
+
+    // for dragging on mouse / touch
+    let isDragging = false;
 
     function resetGameState() {
       clearInterval(timerInterval);
@@ -481,12 +485,6 @@
       updateScoreDisplay();
     }
 
-    function startGameAuto() {
-      attemptCount++;
-      const setNumber = attemptCount % 2 === 1 ? 1 : 2; // 1st,3rd,5th... -> Set 1; 2nd,4th... -> Set 2
-      startGame(setNumber);
-    }
-
     function startGame(setNumber) {
       resetGameState();
       currentQuestions = setNumber === 1 ? SET1_QUESTIONS : SET2_QUESTIONS;
@@ -502,7 +500,6 @@
       }, 0);
 
       startTimer();
-      startBackgroundMusic();
       loadQuestion();
     }
 
@@ -568,17 +565,17 @@
         el.textContent = opt.flag;
         gameArea.appendChild(el);
 
-        const flagWidth = 34; // approx
+        const flagWidth = 44; // approx
         const x = Math.random() * (areaWidth - flagWidth - 20) + 10;
-        const speed = 1.5 + Math.random() * 1.5;
+        const speed = 0.7 + Math.random() * 0.7; // slower falling
 
         el.style.left = x + "px";
-        el.style.top = "-40px";
+        el.style.top = "-50px";
 
         fallingFlags.push({
           el,
           x,
-          y: -40,
+          y: -50,
           speed,
           isCorrect: index === q.correctIndex,
           option: opt
@@ -678,19 +675,18 @@
       questionActive = false;
       clearInterval(animationInterval);
       animationInterval = null;
-      stopBackgroundMusic();
 
       resultScreen.style.display = "block";
-      resultTitleEl.textContent = "Game Over!";
       resultDetailEl.textContent = `You answered ${score} out of ${currentQuestions.length} questions correctly.`;
 
       if (score >= 3) {
-        giftMessageEl.textContent = "🎁 You win a small gift! (Please collect it from the booth teacher.)";
-        playWinSound();
-        setTimeout(() => {
-          alert("🎉 Congratulations! You won the game and earned a small gift! Please show this screen to the teacher.");
-        }, 200);
+        resultTitleEl.textContent = "🎉 CONGRATULATIONS! 🎉";
+        giftMessageEl.textContent = "You win a small gift! 🎁";
+        playApplause();
+        // Optional extra popup
+        alert("🎉 CONGRATULATIONS! You win the game! 🎉");
       } else {
+        resultTitleEl.textContent = "Game Over";
         giftMessageEl.textContent = "Keep trying! Get 3 or more correct next time to win a gift.";
       }
     }
@@ -705,6 +701,7 @@
       basket.style.left = basketX + "px";
     }
 
+    // keyboard (desktop extra control)
     window.addEventListener("keydown", (e) => {
       const step = 24;
       if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
@@ -716,112 +713,127 @@
       }
     });
 
-    // ---------- SOUND EFFECTS & MUSIC ----------
+    // mouse / touch controls (desktop + iPad)
+    function startDrag(e) {
+      isDragging = true;
+      moveBasketWithEvent(e);
+    }
+
+    function moveDrag(e) {
+      if (!isDragging) return;
+      moveBasketWithEvent(e);
+    }
+
+    function endDrag() {
+      isDragging = false;
+    }
+
+    function moveBasketWithEvent(e) {
+      let clientX;
+      if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+      } else {
+        clientX = e.clientX;
+      }
+      const rect = gameArea.getBoundingClientRect();
+      basketX = clientX - rect.left - basket.offsetWidth / 2;
+      updateBasketPosition();
+    }
+
+    // Mouse events
+    gameArea.addEventListener("mousedown", (e) => {
+      startDrag(e);
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      moveDrag(e);
+    });
+
+    window.addEventListener("mouseup", () => {
+      endDrag();
+    });
+
+    // Touch events (iPad / phones)
+    gameArea.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      startDrag(e);
+    }, { passive: false });
+
+    window.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      moveDrag(e);
+    }, { passive: false });
+
+    window.addEventListener("touchend", () => {
+      endDrag();
+    });
+
+    // ---------- SOUND EFFECTS ----------
 
     function ensureAudioContext() {
       if (!audioCtx) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
+        if (!AudioContext) return null;
         audioCtx = new AudioContext();
       }
+      return audioCtx;
     }
 
     function playBeep() {
-      try {
-        ensureAudioContext();
-        if (!audioCtx) return;
+      const ctx = ensureAudioContext();
+      if (!ctx) return;
 
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
 
-        osc.type = "square";
-        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      osc.type = "square";
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
 
-        osc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
+      gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
 
-        osc.start();
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
-        osc.stop(audioCtx.currentTime + 0.15);
-      } catch (e) {
-        // ignore audio errors
-      }
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      osc.start();
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      osc.stop(ctx.currentTime + 0.15);
     }
 
-    function playWinSound() {
-      try {
-        ensureAudioContext();
-        if (!audioCtx) return;
+    function playApplause() {
+      const ctx = ensureAudioContext();
+      if (!ctx) return;
 
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
+      const duration = 1.2;
+      const sampleRate = ctx.sampleRate;
+      const buffer = ctx.createBuffer(1, sampleRate * duration, sampleRate);
+      const data = buffer.getChannelData(0);
 
-        osc.type = "triangle";
-        osc.frequency.setValueAtTime(600, now);
-        osc.frequency.linearRampToValueAtTime(900, now + 0.3);
-
-        gainNode.gain.setValueAtTime(0.25, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-
-        osc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        osc.start(now);
-        osc.stop(now + 0.4);
-      } catch (e) {
-        // ignore audio errors
+      for (let i = 0; i < data.length; i++) {
+        const t = i / sampleRate;
+        // white noise with quick decay = clap / applause-like
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-3 * t);
       }
-    }
 
-    function startBackgroundMusic() {
-      try {
-        ensureAudioContext();
-        if (!audioCtx) return;
+      const noise = ctx.createBufferSource();
+      const gain = ctx.createGain();
+      gain.gain.value = 0.6;
 
-        stopBackgroundMusic(); // clear any previous loop
-
-        const notes = [261.63, 329.63, 392.00, 523.25]; // C, E, G, C
-
-        bgMusicInterval = setInterval(() => {
-          const osc = audioCtx.createOscillator();
-          const gainNode = audioCtx.createGain();
-
-          osc.type = "sine";
-          const freq = notes[Math.floor(Math.random() * notes.length)];
-          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-
-          gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-
-          osc.connect(gainNode);
-          gainNode.connect(audioCtx.destination);
-
-          osc.start();
-          gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-          osc.stop(audioCtx.currentTime + 0.4);
-        }, 600);
-      } catch (e) {
-        // ignore audio errors
-      }
-    }
-
-    function stopBackgroundMusic() {
-      if (bgMusicInterval) {
-        clearInterval(bgMusicInterval);
-        bgMusicInterval = null;
-      }
+      noise.buffer = buffer;
+      noise.connect(gain);
+      gain.connect(ctx.destination);
+      noise.start();
     }
 
     // ---------- BUTTON HOOKUP ----------
 
-    document.getElementById("start-game").addEventListener("click", startGameAuto);
-    document.getElementById("play-again").addEventListener("click", startGameAuto);
+    document.getElementById("start-set-1").addEventListener("click", () => startGame(1));
+    document.getElementById("start-set-2").addEventListener("click", () => startGame(2));
 
+    document.getElementById("play-again-set1").addEventListener("click", () => startGame(1));
+    document.getElementById("play-again-set2").addEventListener("click", () => startGame(2));
     document.getElementById("back-to-intro").addEventListener("click", () => {
       clearInterval(timerInterval);
       clearInterval(animationInterval);
-      stopBackgroundMusic();
       introScreen.style.display = "block";
       gameScreen.style.display = "none";
     });
