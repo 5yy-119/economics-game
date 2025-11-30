@@ -45,11 +45,11 @@
     }
 
     button {
-      padding: 10px 18px;
+      padding: 12px 22px;
       border-radius: 999px;
       border: none;
       cursor: pointer;
-      font-size: 15px;
+      font-size: 16px;
       background: #2563eb;
       color: white;
       box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
@@ -67,17 +67,9 @@
       box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
     }
 
-    .play-btn-big {
+    .big-play-btn {
       font-size: 22px;
-      padding: 18px 40px;
-      border-radius: 999px;
-    }
-
-    .small-btn {
-      font-size: 12px;
-      padding: 6px 12px;
-      box-shadow: none;
-      background: #4b5563;
+      padding: 16px 36px;
     }
 
     .concepts {
@@ -121,12 +113,10 @@
       flex-wrap: wrap;
     }
 
-    .hud-left,
-    .hud-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
+    #fullscreen-btn {
+      font-size: 13px;
+      padding: 6px 10px;
+      box-shadow: none;
     }
 
     .question-text {
@@ -148,22 +138,22 @@
     .flag {
       position: absolute;
       top: -80px;
-      font-size: 68px; /* doubled */
+      font-size: 60px; /* big flags */
       pointer-events: none;
       user-select: none;
     }
 
     #basket {
       position: absolute;
-      bottom: 18px;
-      width: 160px;       /* doubled */
-      height: 80px;       /* doubled */
+      bottom: 16px;
+      width: 160px;        /* larger basket */
+      height: 80px;        /* larger basket */
       border-radius: 999px;
       background: #f97316;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 56px;    /* bigger basket emoji */
+      font-size: 48px;     /* larger basket emoji */
       color: #fff;
       box-shadow: 0 3px 8px rgba(124, 45, 18, 0.4);
     }
@@ -174,18 +164,16 @@
       background: #f9fafb;
       border-radius: 12px;
       padding: 8px 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 10px;
     }
 
     #options-legend span {
+      margin-right: 10px;
       white-space: nowrap;
     }
 
     #message {
       margin-top: 10px;
-      min-height: 30px;
+      min-height: 40px;
       font-size: 14px;
     }
 
@@ -199,7 +187,7 @@
 
     #result-screen {
       margin-top: 16px;
-      padding: 16px 18px;
+      padding: 12px 14px;
       border-radius: 12px;
       background: #ecfdf5;
       border: 1px solid #22c55e;
@@ -209,22 +197,45 @@
       overflow: hidden;
     }
 
-    #result-screen strong {
+    #result-title {
       display: block;
       margin-bottom: 4px;
-      font-size: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
     }
 
-    #big-congrats {
-      font-size: 32px;
-      font-weight: 800;
-      text-align: center;
-      margin-bottom: 8px;
+    #result-title.win {
+      font-size: 30px;
+      background: linear-gradient(90deg, #f97316, #ec4899, #6366f1, #22c55e);
+      -webkit-background-clip: text;
+      color: transparent;
+      animation: celebrateText 1.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes celebrateText {
+      0% { transform: scale(1); text-shadow: 0 0 6px rgba(248, 250, 252, 0.7); }
+      100% { transform: scale(1.06); text-shadow: 0 0 18px rgba(248, 250, 252, 1); }
+    }
+
+    .confetti {
+      position: absolute;
+      width: 8px;
+      height: 14px;
+      border-radius: 2px;
+      opacity: 0.9;
+      animation: fallConfetti 1.4s linear forwards;
+    }
+
+    @keyframes fallConfetti {
+      0% { transform: translateY(-10px) rotate(0deg); }
+      100% { transform: translateY(80px) rotate(360deg); opacity: 0; }
     }
 
     .gift {
       margin-top: 4px;
       font-weight: 600;
+      text-align: center;
     }
 
     .controls-hint {
@@ -234,22 +245,42 @@
       color: #666;
     }
 
-    .confetti-dot {
+    #play-overlay {
       position: absolute;
-      border-radius: 999px;
-      opacity: 0.9;
-      pointer-events: none;
-      animation: confetti-fall 1.2s ease-out forwards;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #f9fafb;
+      z-index: 10;
     }
 
-    @keyframes confetti-fall {
-      0% { transform: translateY(-20px) scale(1); opacity: 1; }
-      100% { transform: translateY(60px) scale(0.6); opacity: 0; }
+    #play-overlay h2 {
+      margin-bottom: 10px;
+      font-size: 26px;
+    }
+
+    #play-overlay p {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 14px;
+      text-align: center;
+      max-width: 320px;
     }
 
     @media (max-width: 700px) {
       #game-area {
-        height: 360px;
+        height: 340px;
+      }
+      #basket {
+        width: 140px;
+        height: 70px;
+        font-size: 40px;
+      }
+      .flag {
+        font-size: 52px;
       }
     }
   </style>
@@ -258,7 +289,7 @@
   <div class="container">
     <h1>The World’s Most</h1>
     <p class="subtitle">
-      Move the 🧺 basket with your <strong>finger</strong> (on iPad) or <strong>mouse</strong> / <strong>keys</strong> (on computer) to catch the correct national flag!
+      Move the 🧺 basket with your finger (iPad) or mouse (computer) to collect the correct national flag before it falls!
     </p>
 
     <!-- INTRO / CONCEPTS SCREEN -->
@@ -286,45 +317,42 @@
       </p>
 
       <div class="btn-row">
-        <button id="start-set-1" class="play-btn-big">PLAY – Set 1</button>
-        <button id="start-set-2" class="play-btn-big">PLAY – Set 2</button>
+        <button id="start-set-1">Play Set 1</button>
+        <button id="start-set-2">Play Set 2</button>
       </div>
 
       <p class="controls-hint">
-        Controls: <br/>
-        On iPad: drag your finger left / right over the game area. <br/>
-        On computer: move mouse (click & drag) or use <strong>←</strong> / <strong>→</strong> keys.
+        Controls: Drag / move inside the sky area to move the basket. Keyboard ← / → also works on computers.
       </p>
     </div>
 
     <!-- GAME SCREEN -->
     <div id="game-screen">
       <div class="hud">
-        <div class="hud-left">
-          <div id="question-counter">Question 1 / 6</div>
-          <div id="score-display">Correct: 0</div>
-        </div>
-        <div class="hud-right">
-          <div id="timer">Time left: 03:00</div>
-          <button id="fullscreen-btn" class="small-btn" type="button">Full Screen</button>
-        </div>
+        <div id="question-counter">Question 1 / 6</div>
+        <div id="timer">Time left: 03:00</div>
+        <div id="score-display">Correct: 0</div>
+        <button id="fullscreen-btn">Full Screen</button>
       </div>
-
       <div class="question-text" id="question-text"></div>
 
       <div id="game-area">
         <div id="basket">🧺</div>
+        <div id="play-overlay">
+          <h2>Get Ready!</h2>
+          <p>Tap or click <strong>PLAY</strong> to start the round. Collect the correct flag for each question!</p>
+          <button id="play-button" class="big-play-btn">PLAY</button>
+        </div>
       </div>
 
       <div id="options-legend"></div>
       <div id="message"></div>
 
       <div id="result-screen">
-        <div id="big-congrats" style="display:none;">🎉 CONGRATULATIONS! 🎉</div>
         <strong id="result-title"></strong>
         <span id="result-detail"></span>
         <div class="gift" id="gift-message"></div>
-        <div class="btn-row" style="margin-top:10px; justify-content:flex-start;">
+        <div class="btn-row" style="margin-top:10px; justify-content:center;">
           <button id="play-again-set1">Play Set 1 Again</button>
           <button id="play-again-set2">Play Set 2 Again</button>
           <button id="back-to-intro">Back to Concepts</button>
@@ -491,6 +519,7 @@
     ];
 
     // ---------- GAME STATE ----------
+
     const introScreen = document.getElementById("intro-screen");
     const gameScreen = document.getElementById("game-screen");
     const questionTextEl = document.getElementById("question-text");
@@ -505,7 +534,8 @@
     const resultTitleEl = document.getElementById("result-title");
     const resultDetailEl = document.getElementById("result-detail");
     const giftMessageEl = document.getElementById("gift-message");
-    const bigCongratsEl = document.getElementById("big-congrats");
+    const playOverlay = document.getElementById("play-overlay");
+    const playButton = document.getElementById("play-button");
     const fullscreenBtn = document.getElementById("fullscreen-btn");
 
     let currentQuestions = [];
@@ -517,101 +547,74 @@
     let fallingFlags = [];
     let questionActive = false;
     let basketX = 0;
+    let chosenSet = 1;
 
-    // audio state
+    // Audio
     let audioCtx = null;
-    let bgOsc = null;
-    let bgGain = null;
+    let bgMusicInterval = null;
 
-    function ensureAudioContext() {
+    function ensureAudioCtx() {
       if (!audioCtx) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
+        if (!AudioContext) return null;
         audioCtx = new AudioContext();
       }
-      if (audioCtx.state === "suspended") {
-        audioCtx.resume();
-      }
+      return audioCtx;
     }
 
-    function startBackgroundMusic() {
-      ensureAudioContext();
-      if (!audioCtx || bgOsc) return;
-      bgOsc = audioCtx.createOscillator();
-      bgGain = audioCtx.createGain();
-      bgOsc.type = "triangle";
-      bgOsc.frequency.setValueAtTime(220, audioCtx.currentTime); // low gentle tone
-      bgGain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-      bgOsc.connect(bgGain);
-      bgGain.connect(audioCtx.destination);
-      bgOsc.start();
-    }
-
-    function stopBackgroundMusic() {
-      if (bgOsc) {
-        bgOsc.stop();
-        bgOsc.disconnect();
-        bgOsc = null;
-      }
-      if (bgGain) {
-        bgGain.disconnect();
-        bgGain = null;
-      }
+    function playTone(freq, duration, type = "sine", volume = 0.18) {
+      const ctx = ensureAudioCtx();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(volume, ctx.currentTime);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+      osc.stop(ctx.currentTime + duration + 0.02);
     }
 
     function playCorrectSound() {
-      ensureAudioContext();
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = "sine";
-      const now = audioCtx.currentTime;
-      osc.frequency.setValueAtTime(880, now);
-      osc.frequency.setValueAtTime(1320, now + 0.12);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.36);
+      // cheerful two-note chime
+      playTone(880, 0.18, "sine", 0.22);
+      setTimeout(() => playTone(1174.66, 0.18, "sine", 0.22), 200);
     }
 
     function playWrongSound() {
-      ensureAudioContext();
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = "square";
-      const now = audioCtx.currentTime;
-      osc.frequency.setValueAtTime(260, now);
-      osc.frequency.setValueAtTime(180, now + 0.12);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.36);
+      // short low "oops"
+      playTone(220, 0.25, "sawtooth", 0.18);
     }
 
-    function playApplause() {
-      ensureAudioContext();
-      if (!audioCtx) return;
-      // simple fake "applause" using noise + quick volume envelope
-      const bufferSize = audioCtx.sampleRate * 0.8;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize); // fade out noise
-      }
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
-      noise.connect(gain);
-      gain.connect(audioCtx.destination);
-      noise.start();
+    function startBackgroundMusic() {
+      const ctx = ensureAudioCtx();
+      if (!ctx || bgMusicInterval) return;
+
+      const notes = [523.25, 659.25, 783.99, 659.25, 587.33, 659.25]; // light major pattern
+      let i = 0;
+      bgMusicInterval = setInterval(() => {
+        playTone(notes[i % notes.length], 0.35, "sine", 0.08);
+        i++;
+      }, 550);
     }
+
+    function stopBackgroundMusic() {
+      if (bgMusicInterval) {
+        clearInterval(bgMusicInterval);
+        bgMusicInterval = null;
+      }
+    }
+
+    function playApplauseCelebration() {
+      // simple fast cheerful burst
+      playTone(659.25, 0.2, "square", 0.25);
+      setTimeout(() => playTone(987.77, 0.2, "square", 0.25), 150);
+      setTimeout(() => playTone(1318.51, 0.25, "square", 0.25), 300);
+    }
+
+    // ---------- GAME FLOW ----------
 
     function resetGameState() {
       clearInterval(timerInterval);
@@ -626,18 +629,26 @@
       messageEl.textContent = "";
       optionsLegendEl.textContent = "";
       resultScreen.style.display = "none";
-      bigCongratsEl.style.display = "none";
       updateTimerDisplay();
       updateScoreDisplay();
-      stopBackgroundMusic();
+
+      // remove flags if any leftover
+      const oldFlags = gameArea.querySelectorAll(".flag");
+      oldFlags.forEach(f => f.remove());
     }
 
-    function startGame(setNumber) {
-      resetGameState();
-      currentQuestions = setNumber === 1 ? SET1_QUESTIONS : SET2_QUESTIONS;
-
+    function prepareGame(setNumber) {
+      chosenSet = setNumber;
       introScreen.style.display = "none";
       gameScreen.style.display = "block";
+      playOverlay.style.display = "flex";
+    }
+
+    function startGame() {
+      resetGameState();
+      currentQuestions = chosenSet === 1 ? SET1_QUESTIONS : SET2_QUESTIONS;
+
+      playOverlay.style.display = "none";
 
       // Place basket in the center
       setTimeout(() => {
@@ -646,9 +657,8 @@
         updateBasketPosition();
       }, 0);
 
-      ensureAudioContext();
-      startBackgroundMusic();
       startTimer();
+      startBackgroundMusic();
       loadQuestion();
     }
 
@@ -678,6 +688,7 @@
     function loadQuestion() {
       clearInterval(animationInterval);
       animationInterval = null;
+
       // Remove old flags
       fallingFlags.forEach(f => {
         if (f.el && f.el.parentNode) f.el.parentNode.removeChild(f.el);
@@ -697,26 +708,19 @@
       questionCounterEl.textContent = `Question ${currentIndex + 1} / ${currentQuestions.length}`;
       questionTextEl.textContent = q.text;
 
-      // Show options legend
+      // Show options legend (flag + country name)
       q.options.forEach(opt => {
         const span = document.createElement("span");
         span.textContent = `${opt.flag} ${opt.country}`;
         optionsLegendEl.appendChild(span);
       });
 
+      // Create falling flags with more spacing
       const areaWidth = gameArea.clientWidth;
       const areaHeight = gameArea.clientHeight;
-
-      // Precomputed positions for more distance between flags
-      const numFlags = q.options.length;
-      const positions = [];
-      for (let i = 0; i < numFlags; i++) {
-        const fraction = (i + 0.5) / numFlags; // e.g. 0.125, 0.375, etc.
-        positions.push(fraction * areaWidth);
-      }
-      positions.sort(() => Math.random() - 0.5); // shuffle
-
-      const approxFlagWidth = 68;
+      const numOptions = q.options.length;
+      const colWidth = areaWidth / numOptions;
+      const approxFlagWidth = 60;
 
       q.options.forEach((opt, index) => {
         const el = document.createElement("div");
@@ -724,17 +728,18 @@
         el.textContent = opt.flag;
         gameArea.appendChild(el);
 
-        const centerX = positions[index];
-        const x = centerX - approxFlagWidth / 2;
-        const speed = 0.7 + Math.random() * 0.8; // slower fall
+        const baseCenter = colWidth * index + colWidth / 2;
+        const x = baseCenter - approxFlagWidth / 2;
+
+        const speed = 0.7 + Math.random() * 0.6; // slower fall
 
         el.style.left = x + "px";
-        el.style.top = (-80 - Math.random() * 40) + "px";
+        el.style.top = "-80px";
 
         fallingFlags.push({
           el,
           x,
-          y: -80 - Math.random() * 40,
+          y: -80,
           speed,
           isCorrect: index === q.correctIndex,
           option: opt
@@ -756,6 +761,7 @@
         flag.y += flag.speed;
         flag.el.style.top = flag.y + "px";
 
+        // Collision detection
         const flagRect = flag.el.getBoundingClientRect();
         if (isIntersecting(basketRect, flagRect) && questionActive) {
           handleFlagCaught(flag);
@@ -764,7 +770,7 @@
 
       // Remove flags that fall out of area
       fallingFlags = fallingFlags.filter(flag => {
-        if (flag.y > areaHeight + 100) {
+        if (flag.y > areaHeight + 40) {
           if (flag.el && flag.el.parentNode) {
             flag.el.parentNode.removeChild(flag.el);
           }
@@ -773,7 +779,7 @@
         return true;
       });
 
-      // If all flags are gone and question still active -> move on
+      // If all flags are gone and question still active -> move on (treated as incorrect)
       if (fallingFlags.length === 0 && questionActive) {
         questionActive = false;
         messageEl.textContent = "Time’s up for this question! The flags disappeared.";
@@ -781,7 +787,7 @@
         setTimeout(() => {
           currentIndex++;
           loadQuestion();
-        }, 2500); // give more time to read
+        }, 3200); // a bit longer so they can read
       }
     }
 
@@ -807,7 +813,7 @@
           if (f.el && f.el.parentNode) f.el.parentNode.removeChild(f.el);
         });
         fallingFlags = [];
-      }, 400);
+      }, 200);
 
       const q = currentQuestions[currentIndex];
       const correctOption = q.options[q.correctIndex];
@@ -824,11 +830,11 @@
         messageEl.className = "wrong";
       }
 
-      // give students more time to read explanation
+      // Give students a few seconds to read the explanation
       setTimeout(() => {
         currentIndex++;
         loadQuestion();
-      }, 3500);
+      }, 3400);
     }
 
     function endGame() {
@@ -838,39 +844,38 @@
       stopBackgroundMusic();
 
       resultScreen.style.display = "block";
-      resultTitleEl.textContent = "Game Over!";
+
       resultDetailEl.textContent = `You answered ${score} out of ${currentQuestions.length} questions correctly.`;
 
       if (score >= 3) {
-        bigCongratsEl.style.display = "block";
-        giftMessageEl.textContent = "🎁 You win a small gift!";
+        resultTitleEl.textContent = "🎉 CONGRATULATIONS! 🎉";
+        resultTitleEl.classList.add("win");
+        giftMessageEl.textContent = "🎁 You win a small gift! (Collect it from the booth!)";
         launchConfetti();
-        playApplause();
+        playApplauseCelebration();
       } else {
-        bigCongratsEl.style.display = "none";
+        resultTitleEl.textContent = "Nice try!";
+        resultTitleEl.classList.remove("win");
         giftMessageEl.textContent = "Keep trying! Get 3 or more correct next time to win a gift.";
       }
     }
 
     function launchConfetti() {
-      const colors = ["#f97316", "#22c55e", "#3b82f6", "#e11d48", "#a855f7"];
-      for (let i = 0; i < 80; i++) {
-        const dot = document.createElement("div");
-        dot.className = "confetti-dot";
-        const size = 6 + Math.random() * 6;
-        dot.style.width = size + "px";
-        dot.style.height = size + "px";
-        dot.style.background = colors[Math.floor(Math.random() * colors.length)];
-        dot.style.left = Math.random() * 100 + "%";
-        dot.style.top = Math.random() * 20 + "%";
-        resultScreen.appendChild(dot);
+      const colors = ["#f97316", "#ec4899", "#22c55e", "#3b82f6", "#eab308"];
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti";
+        piece.style.background = colors[i % colors.length];
+        piece.style.left = Math.random() * 100 + "%";
+        piece.style.top = Math.random() * -20 + "px";
+        resultScreen.appendChild(piece);
         setTimeout(() => {
-          if (dot.parentNode) dot.parentNode.removeChild(dot);
-        }, 1300);
+          if (piece.parentNode) piece.parentNode.removeChild(piece);
+        }, 1600);
       }
     }
 
-    // ---------- BASKET MOVEMENT (mouse + touch + keys) ----------
+    // ---------- BASKET MOVEMENT (MOUSE + TOUCH + OPTIONAL KEYBOARD) ----------
 
     function updateBasketPosition() {
       const areaWidth = gameArea.clientWidth;
@@ -882,43 +887,43 @@
 
     function moveBasketToClientX(clientX) {
       const rect = gameArea.getBoundingClientRect();
-      basketX = clientX - rect.left - basket.offsetWidth / 2;
+      const x = clientX - rect.left - basket.offsetWidth / 2;
+      basketX = x;
       updateBasketPosition();
     }
 
-    // Pointer / mouse drag
-    let pointerDown = false;
-
-    gameArea.addEventListener("pointerdown", (e) => {
-      pointerDown = true;
+    // Mouse
+    let isDragging = false;
+    gameArea.addEventListener("mousedown", (e) => {
+      isDragging = true;
       moveBasketToClientX(e.clientX);
     });
-
-    window.addEventListener("pointerup", () => {
-      pointerDown = false;
-    });
-
-    gameArea.addEventListener("pointermove", (e) => {
-      if (!pointerDown) return;
+    window.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
       moveBasketToClientX(e.clientX);
     });
+    window.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
 
-    // Touch fallback (for older iPads)
+    // Touch
     gameArea.addEventListener("touchstart", (e) => {
+      e.preventDefault();
       if (e.touches.length > 0) {
         moveBasketToClientX(e.touches[0].clientX);
       }
-    }, { passive: true });
+    }, { passive: false });
 
     gameArea.addEventListener("touchmove", (e) => {
+      e.preventDefault();
       if (e.touches.length > 0) {
         moveBasketToClientX(e.touches[0].clientX);
       }
-    }, { passive: true });
+    }, { passive: false });
 
-    // Keyboard (still available on desktop)
+    // Optional keyboard for desktop
     window.addEventListener("keydown", (e) => {
-      const step = 30;
+      const step = 32;
       if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
         basketX -= step;
         updateBasketPosition();
@@ -931,21 +936,45 @@
     // ---------- FULLSCREEN ----------
 
     fullscreenBtn.addEventListener("click", () => {
-      const elem = document.documentElement;
-      if (!document.fullscreenElement && elem.requestFullscreen) {
-        elem.requestFullscreen();
-      } else if (document.exitFullscreen) {
-        document.exitFullscreen();
+      const docEl = document.documentElement;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (docEl.requestFullscreen) docEl.requestFullscreen();
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
       }
     });
 
     // ---------- BUTTON HOOKUP ----------
 
-    document.getElementById("start-set-1").addEventListener("click", () => startGame(1));
-    document.getElementById("start-set-2").addEventListener("click", () => startGame(2));
+    document.getElementById("start-set-1").addEventListener("click", () => {
+      chosenSet = 1;
+      prepareGame(1);
+    });
 
-    document.getElementById("play-again-set1").addEventListener("click", () => startGame(1));
-    document.getElementById("play-again-set2").addEventListener("click", () => startGame(2));
+    document.getElementById("start-set-2").addEventListener("click", () => {
+      chosenSet = 2;
+      prepareGame(2);
+    });
+
+    playButton.addEventListener("click", () => {
+      // first user interaction – safe to start audio
+      startGame();
+    });
+
+    document.getElementById("play-again-set1").addEventListener("click", () => {
+      chosenSet = 1;
+      playOverlay.style.display = "flex";
+      resetGameState();
+    });
+
+    document.getElementById("play-again-set2").addEventListener("click", () => {
+      chosenSet = 2;
+      playOverlay.style.display = "flex";
+      resetGameState();
+    });
+
     document.getElementById("back-to-intro").addEventListener("click", () => {
       clearInterval(timerInterval);
       clearInterval(animationInterval);
