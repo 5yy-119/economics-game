@@ -14,10 +14,6 @@
       align-items: flex-start;
       min-height: 100vh;
       color: #222;
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      user-select: none;
-      touch-action: none;
     }
 
     .container {
@@ -123,7 +119,6 @@
       background: linear-gradient(180deg, #e0f2fe, #fef9c3);
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
-      touch-action: none;
     }
 
     .flag {
@@ -136,18 +131,18 @@
 
     #basket {
       position: absolute;
-      bottom: 18px;
-      width: 110px;   /* bigger basket */
-      height: 55px;
+      bottom: 14px;
+      width: 110px;      /* bigger basket */
+      height: 60px;      /* bigger basket */
       border-radius: 999px;
       background: #f97316;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;  /* bigger basket emoji */
+      font-size: 40px;   /* bigger emoji */
       color: #fff;
       box-shadow: 0 3px 8px rgba(124, 45, 18, 0.4);
-      touch-action: none;
+      touch-action: none; /* better for touch dragging */
     }
 
     #options-legend {
@@ -187,17 +182,14 @@
       font-size: 14px;
     }
 
-    #result-title {
+    #result-screen strong {
       display: block;
       margin-bottom: 4px;
-      font-size: 22px;
-      text-align: center;
     }
 
     .gift {
       margin-top: 4px;
       font-weight: 600;
-      text-align: center;
     }
 
     .controls-hint {
@@ -207,9 +199,32 @@
       color: #666;
     }
 
+    /* Big overlay PLAY button */
+    #game-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    #big-play-button {
+      font-size: 24px;
+      padding: 14px 36px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 10px 25px rgba(34, 197, 94, 0.6);
+    }
+
+    #big-play-button:hover {
+      background: #16a34a;
+    }
+
     @media (max-width: 700px) {
       #game-area {
-        height: 360px;
+        height: 340px;
       }
     }
   </style>
@@ -218,7 +233,7 @@
   <div class="container">
     <h1>The World’s Most</h1>
     <p class="subtitle">
-      Tap or click and drag the 🧺 basket to collect the correct national flag before it falls!
+      Move the 🧺 basket with your mouse or finger to collect the correct national flag before it falls!
     </p>
 
     <!-- INTRO / CONCEPTS SCREEN -->
@@ -251,7 +266,7 @@
       </div>
 
       <p class="controls-hint">
-        Controls: <strong>Tap / drag</strong> on iPad, or <strong>click and drag</strong> on a computer.
+        Controls: On computer, move your <strong>mouse</strong>. On iPad, drag with your <strong>finger</strong>.
       </p>
     </div>
 
@@ -266,6 +281,9 @@
 
       <div id="game-area">
         <div id="basket">🧺</div>
+        <div id="game-overlay">
+          <button id="big-play-button">PLAY</button>
+        </div>
       </div>
 
       <div id="options-legend"></div>
@@ -287,6 +305,10 @@
       </p>
     </div>
   </div>
+
+  <!-- AUDIO ELEMENTS (you need to add these files to your repo) -->
+  <audio id="bg-music" src="bg-music.mp3" loop></audio>
+  <audio id="applause-sound" src="applause.mp3"></audio>
 
   <script>
     // ---------- QUESTION DATA ----------
@@ -457,6 +479,11 @@
     const resultTitleEl = document.getElementById("result-title");
     const resultDetailEl = document.getElementById("result-detail");
     const giftMessageEl = document.getElementById("gift-message");
+    const gameOverlay = document.getElementById("game-overlay");
+    const bigPlayButton = document.getElementById("big-play-button");
+
+    const bgMusicEl = document.getElementById("bg-music");
+    const applauseEl = document.getElementById("applause-sound");
 
     let currentQuestions = [];
     let currentIndex = 0;
@@ -468,8 +495,7 @@
     let questionActive = false;
     let basketX = 0;
     let audioCtx = null;
-
-    // for touch / mouse drag
+    let currentSetNumber = 1;
     let isDragging = false;
 
     function resetGameState() {
@@ -488,22 +514,32 @@
       resultScreen.style.display = "none";
       updateTimerDisplay();
       updateScoreDisplay();
+      // clear flags from previous game
+      const oldFlags = gameArea.querySelectorAll(".flag");
+      oldFlags.forEach(f => f.remove());
+      gameOverlay.style.display = "flex"; // show PLAY
     }
 
     function startGame(setNumber) {
-      resetGameState();
+      currentSetNumber = setNumber;
       currentQuestions = setNumber === 1 ? SET1_QUESTIONS : SET2_QUESTIONS;
 
       introScreen.style.display = "none";
       gameScreen.style.display = "block";
 
-      // Place basket in the center after layout
+      resetGameState();
+
+      // Place basket in the center
       setTimeout(() => {
         const areaWidth = gameArea.clientWidth;
         basketX = (areaWidth - basket.offsetWidth) / 2;
         updateBasketPosition();
       }, 0);
+    }
 
+    function actuallyStartRound() {
+      // Start music on first PLAY (user gesture)
+      startBackgroundMusic();
       startTimer();
       loadQuestion();
     }
@@ -573,7 +609,7 @@
 
         const flagWidth = 44; // approx
         const x = Math.random() * (areaWidth - flagWidth - 20) + 10;
-        const speed = 0.7 + Math.random() * 0.8; // slower fall
+        const speed = 0.6 + Math.random() * 0.9; // slower!
 
         el.style.left = x + "px";
         el.style.top = "-50px";
@@ -591,7 +627,7 @@
       // Start animation
       animationInterval = setInterval(() => {
         updateFlags(areaHeight);
-      }, 35);
+      }, 30);
     }
 
     function updateFlags(areaHeight) {
@@ -681,22 +717,23 @@
       questionActive = false;
       clearInterval(animationInterval);
       animationInterval = null;
+      stopBackgroundMusic();
 
       resultScreen.style.display = "block";
 
       if (score >= 3) {
         resultTitleEl.textContent = "🎉 CONGRATULATIONS! 🎉";
         playApplause();
-        giftMessageEl.textContent = "You answered enough questions correctly to win a small gift!";
+        giftMessageEl.textContent = "You win a small gift! 🎁";
       } else {
-        resultTitleEl.textContent = "Nice Try!";
+        resultTitleEl.textContent = "Good try!";
         giftMessageEl.textContent = "Keep trying! Get 3 or more correct next time to win a gift.";
       }
 
       resultDetailEl.textContent = `You answered ${score} out of ${currentQuestions.length} questions correctly.`;
     }
 
-    // ---------- BASKET MOVEMENT (MOUSE + TOUCH) ----------
+    // ---------- BASKET MOVEMENT (mouse + touch) ----------
 
     function updateBasketPosition() {
       const areaWidth = gameArea.clientWidth;
@@ -708,7 +745,8 @@
 
     function moveBasketToClientX(clientX) {
       const rect = gameArea.getBoundingClientRect();
-      basketX = clientX - rect.left - basket.offsetWidth / 2;
+      const xInside = clientX - rect.left;
+      basketX = xInside - basket.offsetWidth / 2;
       updateBasketPosition();
     }
 
@@ -718,27 +756,20 @@
       moveBasketToClientX(e.clientX);
     });
 
-    window.addEventListener("mousemove", (e) => {
-      if (!isDragging) return;
-      moveBasketToClientX(e.clientX);
-    });
-
     window.addEventListener("mouseup", () => {
       isDragging = false;
     });
 
+    gameArea.addEventListener("mousemove", (e) => {
+      if (isDragging) {
+        moveBasketToClientX(e.clientX);
+      }
+    });
+
     // Touch controls (iPad / phone)
     gameArea.addEventListener("touchstart", (e) => {
-      if (e.touches.length > 0) {
-        isDragging = true;
-        moveBasketToClientX(e.touches[0].clientX);
-      }
-    }, { passive: false });
-
-    window.addEventListener("touchmove", (e) => {
-      if (!isDragging) return;
-      if (e.touches.length > 0) {
-        e.preventDefault();
+      isDragging = true;
+      if (e.touches && e.touches[0]) {
         moveBasketToClientX(e.touches[0].clientX);
       }
     }, { passive: false });
@@ -747,29 +778,39 @@
       isDragging = false;
     });
 
-    window.addEventListener("resize", () => {
-      updateBasketPosition();
+    gameArea.addEventListener("touchmove", (e) => {
+      if (isDragging && e.touches && e.touches[0]) {
+        e.preventDefault(); // prevent scrolling while playing
+        moveBasketToClientX(e.touches[0].clientX);
+      }
+    }, { passive: false });
+
+    // Optional: keep keyboard controls as backup
+    window.addEventListener("keydown", (e) => {
+      const step = 24;
+      if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+        basketX -= step;
+        updateBasketPosition();
+      } else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+        basketX += step;
+        updateBasketPosition();
+      }
     });
 
-    // ---------- SOUND EFFECTS ----------
-
-    function ensureAudioContext() {
-      if (audioCtx) return;
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
-      audioCtx = new AudioContext();
-    }
+    // ---------- SOUND EFFECTS & MUSIC ----------
 
     function playBeep() {
       try {
-        ensureAudioContext();
-        if (!audioCtx) return;
-
+        if (!audioCtx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContext) return;
+          audioCtx = new AudioContext();
+        }
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
 
         osc.type = "square";
-        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(900, audioCtx.currentTime);
 
         gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
 
@@ -780,35 +821,28 @@
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
         osc.stop(audioCtx.currentTime + 0.15);
       } catch (e) {
-        // ignore sound errors
+        // ignore if sound fails
       }
     }
 
-    // Simple celebratory "applause-like" chord using tones
+    function startBackgroundMusic() {
+      if (!bgMusicEl) return;
+      bgMusicEl.volume = 0.3;
+      bgMusicEl.play().catch(() => {
+        // autoplay might be blocked; nothing we can do
+      });
+    }
+
+    function stopBackgroundMusic() {
+      if (!bgMusicEl) return;
+      bgMusicEl.pause();
+      bgMusicEl.currentTime = 0;
+    }
+
     function playApplause() {
-      try {
-        ensureAudioContext();
-        if (!audioCtx) return;
-
-        const now = audioCtx.currentTime;
-        const freqs = [440, 660, 880];
-        freqs.forEach((f, i) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = "square";
-          osc.frequency.setValueAtTime(f, now);
-          gain.gain.setValueAtTime(0.15, now + i * 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
-
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-
-          osc.start(now + i * 0.02);
-          osc.stop(now + 0.7);
-        });
-      } catch (e) {
-        // ignore sound errors
-      }
+      if (!applauseEl) return;
+      applauseEl.currentTime = 0;
+      applauseEl.play().catch(() => {});
     }
 
     // ---------- BUTTON HOOKUP ----------
@@ -818,11 +852,18 @@
 
     document.getElementById("play-again-set1").addEventListener("click", () => startGame(1));
     document.getElementById("play-again-set2").addEventListener("click", () => startGame(2));
+
     document.getElementById("back-to-intro").addEventListener("click", () => {
       clearInterval(timerInterval);
       clearInterval(animationInterval);
+      stopBackgroundMusic();
       introScreen.style.display = "block";
       gameScreen.style.display = "none";
+    });
+
+    bigPlayButton.addEventListener("click", () => {
+      gameOverlay.style.display = "none";
+      actuallyStartRound();
     });
   </script>
 </body>
