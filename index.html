@@ -14,6 +14,10 @@
       align-items: flex-start;
       min-height: 100vh;
       color: #222;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: none;
     }
 
     .container {
@@ -114,35 +118,36 @@
 
     #game-area {
       position: relative;
-      height: 360px;
+      height: 380px;
       border-radius: 16px;
       background: linear-gradient(180deg, #e0f2fe, #fef9c3);
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
-      touch-action: none; /* important for iPad dragging */
+      touch-action: none;
     }
 
     .flag {
       position: absolute;
       top: -50px;
-      font-size: 44px;       /* bigger flags */
+      font-size: 44px; /* bigger flags */
       pointer-events: none;
       user-select: none;
     }
 
     #basket {
       position: absolute;
-      bottom: 14px;
-      width: 110px;          /* bigger basket */
+      bottom: 18px;
+      width: 110px;   /* bigger basket */
       height: 55px;
       border-radius: 999px;
       background: #f97316;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;       /* bigger emoji */
+      font-size: 36px;  /* bigger basket emoji */
       color: #fff;
       box-shadow: 0 3px 8px rgba(124, 45, 18, 0.4);
+      touch-action: none;
     }
 
     #options-legend {
@@ -182,10 +187,10 @@
       font-size: 14px;
     }
 
-    #result-screen strong {
+    #result-title {
       display: block;
       margin-bottom: 4px;
-      font-size: 18px;
+      font-size: 22px;
       text-align: center;
     }
 
@@ -204,7 +209,7 @@
 
     @media (max-width: 700px) {
       #game-area {
-        height: 320px;
+        height: 360px;
       }
     }
   </style>
@@ -213,7 +218,7 @@
   <div class="container">
     <h1>The World’s Most</h1>
     <p class="subtitle">
-      Move the 🧺 basket to collect the correct national flag before it falls!
+      Tap or click and drag the 🧺 basket to collect the correct national flag before it falls!
     </p>
 
     <!-- INTRO / CONCEPTS SCREEN -->
@@ -237,7 +242,7 @@
       <h3>Choose Your Question Set</h3>
       <p style="text-align:center; font-size:14px;">
         Each set has 6 questions. You have <strong>3 minutes</strong> to finish.<br/>
-        Get <strong>3 or more correct</strong> to win a small gift 🎁!
+        Get <strong>3 or more correct</strong> to win a small gift 🎁 (in real life at the booth)!
       </p>
 
       <div class="btn-row">
@@ -246,8 +251,7 @@
       </div>
 
       <p class="controls-hint">
-        Desktop: use <strong>mouse</strong> or <strong>arrow keys</strong>.  
-        iPad: move the basket with your <strong>finger</strong>.
+        Controls: <strong>Tap / drag</strong> on iPad, or <strong>click and drag</strong> on a computer.
       </p>
     </div>
 
@@ -465,7 +469,7 @@
     let basketX = 0;
     let audioCtx = null;
 
-    // for dragging on mouse / touch
+    // for touch / mouse drag
     let isDragging = false;
 
     function resetGameState() {
@@ -479,6 +483,7 @@
       fallingFlags = [];
       questionActive = false;
       messageEl.textContent = "";
+      messageEl.className = "";
       optionsLegendEl.textContent = "";
       resultScreen.style.display = "none";
       updateTimerDisplay();
@@ -492,7 +497,7 @@
       introScreen.style.display = "none";
       gameScreen.style.display = "block";
 
-      // Place basket in the center
+      // Place basket in the center after layout
       setTimeout(() => {
         const areaWidth = gameArea.clientWidth;
         basketX = (areaWidth - basket.offsetWidth) / 2;
@@ -535,6 +540,7 @@
       });
       fallingFlags = [];
       messageEl.textContent = "";
+      messageEl.className = "";
       optionsLegendEl.textContent = "";
 
       if (currentIndex >= currentQuestions.length || timeLeft <= 0) {
@@ -567,7 +573,7 @@
 
         const flagWidth = 44; // approx
         const x = Math.random() * (areaWidth - flagWidth - 20) + 10;
-        const speed = 0.7 + Math.random() * 0.7; // slower falling
+        const speed = 0.7 + Math.random() * 0.8; // slower fall
 
         el.style.left = x + "px";
         el.style.top = "-50px";
@@ -585,7 +591,7 @@
       // Start animation
       animationInterval = setInterval(() => {
         updateFlags(areaHeight);
-      }, 30);
+      }, 35);
     }
 
     function updateFlags(areaHeight) {
@@ -677,21 +683,20 @@
       animationInterval = null;
 
       resultScreen.style.display = "block";
-      resultDetailEl.textContent = `You answered ${score} out of ${currentQuestions.length} questions correctly.`;
 
       if (score >= 3) {
         resultTitleEl.textContent = "🎉 CONGRATULATIONS! 🎉";
-        giftMessageEl.textContent = "You win a small gift! 🎁";
         playApplause();
-        // Optional extra popup
-        alert("🎉 CONGRATULATIONS! You win the game! 🎉");
+        giftMessageEl.textContent = "You answered enough questions correctly to win a small gift!";
       } else {
-        resultTitleEl.textContent = "Game Over";
+        resultTitleEl.textContent = "Nice Try!";
         giftMessageEl.textContent = "Keep trying! Get 3 or more correct next time to win a gift.";
       }
+
+      resultDetailEl.textContent = `You answered ${score} out of ${currentQuestions.length} questions correctly.`;
     }
 
-    // ---------- BASKET MOVEMENT ----------
+    // ---------- BASKET MOVEMENT (MOUSE + TOUCH) ----------
 
     function updateBasketPosition() {
       const areaWidth = gameArea.clientWidth;
@@ -701,127 +706,109 @@
       basket.style.left = basketX + "px";
     }
 
-    // keyboard (desktop extra control)
-    window.addEventListener("keydown", (e) => {
-      const step = 24;
-      if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
-        basketX -= step;
-        updateBasketPosition();
-      } else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
-        basketX += step;
-        updateBasketPosition();
-      }
-    });
-
-    // mouse / touch controls (desktop + iPad)
-    function startDrag(e) {
-      isDragging = true;
-      moveBasketWithEvent(e);
-    }
-
-    function moveDrag(e) {
-      if (!isDragging) return;
-      moveBasketWithEvent(e);
-    }
-
-    function endDrag() {
-      isDragging = false;
-    }
-
-    function moveBasketWithEvent(e) {
-      let clientX;
-      if (e.touches && e.touches.length > 0) {
-        clientX = e.touches[0].clientX;
-      } else {
-        clientX = e.clientX;
-      }
+    function moveBasketToClientX(clientX) {
       const rect = gameArea.getBoundingClientRect();
       basketX = clientX - rect.left - basket.offsetWidth / 2;
       updateBasketPosition();
     }
 
-    // Mouse events
+    // Mouse controls
     gameArea.addEventListener("mousedown", (e) => {
-      startDrag(e);
+      isDragging = true;
+      moveBasketToClientX(e.clientX);
     });
 
     window.addEventListener("mousemove", (e) => {
-      moveDrag(e);
+      if (!isDragging) return;
+      moveBasketToClientX(e.clientX);
     });
 
     window.addEventListener("mouseup", () => {
-      endDrag();
+      isDragging = false;
     });
 
-    // Touch events (iPad / phones)
+    // Touch controls (iPad / phone)
     gameArea.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      startDrag(e);
+      if (e.touches.length > 0) {
+        isDragging = true;
+        moveBasketToClientX(e.touches[0].clientX);
+      }
     }, { passive: false });
 
     window.addEventListener("touchmove", (e) => {
-      e.preventDefault();
-      moveDrag(e);
+      if (!isDragging) return;
+      if (e.touches.length > 0) {
+        e.preventDefault();
+        moveBasketToClientX(e.touches[0].clientX);
+      }
     }, { passive: false });
 
     window.addEventListener("touchend", () => {
-      endDrag();
+      isDragging = false;
+    });
+
+    window.addEventListener("resize", () => {
+      updateBasketPosition();
     });
 
     // ---------- SOUND EFFECTS ----------
 
     function ensureAudioContext() {
-      if (!audioCtx) {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return null;
-        audioCtx = new AudioContext();
-      }
-      return audioCtx;
+      if (audioCtx) return;
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      audioCtx = new AudioContext();
     }
 
     function playBeep() {
-      const ctx = ensureAudioContext();
-      if (!ctx) return;
+      try {
+        ensureAudioContext();
+        if (!audioCtx) return;
 
-      const osc = ctx.createOscillator();
-      const gainNode = ctx.createGain();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
 
-      osc.type = "square";
-      osc.frequency.setValueAtTime(800, ctx.currentTime);
+        osc.type = "square";
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
 
-      gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
 
-      osc.connect(gainNode);
-      gainNode.connect(ctx.destination);
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
 
-      osc.start();
-      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-      osc.stop(ctx.currentTime + 0.15);
+        osc.start();
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+        osc.stop(audioCtx.currentTime + 0.15);
+      } catch (e) {
+        // ignore sound errors
+      }
     }
 
+    // Simple celebratory "applause-like" chord using tones
     function playApplause() {
-      const ctx = ensureAudioContext();
-      if (!ctx) return;
+      try {
+        ensureAudioContext();
+        if (!audioCtx) return;
 
-      const duration = 1.2;
-      const sampleRate = ctx.sampleRate;
-      const buffer = ctx.createBuffer(1, sampleRate * duration, sampleRate);
-      const data = buffer.getChannelData(0);
+        const now = audioCtx.currentTime;
+        const freqs = [440, 660, 880];
+        freqs.forEach((f, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "square";
+          osc.frequency.setValueAtTime(f, now);
+          gain.gain.setValueAtTime(0.15, now + i * 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
 
-      for (let i = 0; i < data.length; i++) {
-        const t = i / sampleRate;
-        // white noise with quick decay = clap / applause-like
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-3 * t);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now + i * 0.02);
+          osc.stop(now + 0.7);
+        });
+      } catch (e) {
+        // ignore sound errors
       }
-
-      const noise = ctx.createBufferSource();
-      const gain = ctx.createGain();
-      gain.gain.value = 0.6;
-
-      noise.buffer = buffer;
-      noise.connect(gain);
-      gain.connect(ctx.destination);
-      noise.start();
     }
 
     // ---------- BUTTON HOOKUP ----------
