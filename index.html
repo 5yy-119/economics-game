@@ -319,103 +319,110 @@
     // --------- QUESTION DATA (8 QUESTIONS) ---------
 
     const QUESTIONS = [
-      {
-        id: 1,
-        text: "Which country has the highest GDP in the world?",
-        options: [
-          { country: "China", file: "china.png" },
-          { country: "Japan", file: "japan.png" },
-          { country: "Germany", file: "germany.png" },
-          { country: "United States", file: "united-states.png" } // correct
-        ],
-        correctIndex: 3,
-        explanation: "The United States has the world’s largest economy in terms of nominal GDP."
-      },
-      {
-        id: 2,
-        text: "Which country has the highest GDP per capita?",
-        options: [
-          { country: "Norway", file: "norway.png" },
-          { country: "Luxembourg", file: "luxembourg.png" }, // correct
-          { country: "Switzerland", file: "switzerland.png" },
-          { country: "Singapore", file: "singapore.png" }
-        ],
-        correctIndex: 1,
-        explanation: "Luxembourg’s small population and strong financial sector give it very high GDP per person."
-      },
-      {
-        id: 3,
-        text: "Which country among these has higher income inequality?",
-        options: [
-          { country: "Brazil", file: "brazil.png" }, // correct
-          { country: "China", file: "china.png" },
-          { country: "Germany", file: "germany.png" },
-          { country: "Norway", file: "norway.png" }
-        ],
-        correctIndex: 0,
-        explanation: "Brazil has relatively high income inequality compared with the other countries listed."
-      },
-      {
-        id: 5,
-        text: "Which country has the highest national debt as a percentage of GDP?",
-        options: [
-          { country: "United States", file: "united-states.png" },
-          { country: "Greece", file: "greece.png" },
-          { country: "Japan", file: "japan.png" }, // correct
-          { country: "Italy", file: "italy.png" }
-        ],
-        correctIndex: 2,
-        explanation: "Japan’s public debt is more than twice its GDP, one of the highest ratios in the world."
-      },
-      {
-        id: 6,
-        text: "Which country has one of the lowest unemployment rates?",
-        options: [
-          { country: "Qatar", file: "qatar.png" }, // correct
-          { country: "Germany", file: "germany.png" },
-          { country: "Canada", file: "canada.png" },
-          { country: "Switzerland", file: "switzerland.png" }
-        ],
-        correctIndex: 0,
-        explanation: "Qatar’s labour market structure leads to extremely low measured unemployment."
-      },
-      {
-        id: 11,
-        text: "According to the Big Mac Index, which country often has one of the highest Big Mac prices?",
-        options: [
-          { country: "Switzerland", file: "switzerland.png" }, // correct
-          { country: "China", file: "china.png" },
-          { country: "Hong Kong", file: "hong-kong.png" },
-          { country: "Indonesia", file: "indonesia.png" }
-        ],
-        correctIndex: 0,
-        explanation: "Switzerland usually has one of the most expensive Big Macs, showing a strong currency and high price level."
-      },
-      {
-        id: 13,
-        text: "Which country has the highest number of billionaires?",
-        options: [
-          { country: "France", file: "france.png" },
-          { country: "United States", file: "united-states.png" }, // correct
-          { country: "Germany", file: "germany.png" },
-          { country: "Canada", file: "canada.png" }
-        ],
-        correctIndex: 1,
-        explanation: "The United States leads the world in number of billionaires, driven by tech, finance and other industries."
-      },
-      {
-        id: 16,
-        text: "Which country among the following has one of the lowest minimum wages (in HKD terms)?",
-        options: [
-          { country: "United States", file: "united-states.png" },
-          { country: "United Kingdom", file: "united-kingdom.png" },
-          { country: "Philippines", file: "philippines.png" }, // correct
-          { country: "Australia", file: "australia.png" }
-        ],
-        correctIndex: 2,
-        explanation: "The Philippines has a much lower statutory minimum wage than the other countries listed, when converted into HKD."
-      }
-    ];
+  {
+    id: 1,
+    text: "Which country has the highest GDP in the world?",
+    options: [
+      { country: "🇨🇳 China", file: "china.png" },
+      { country: "🇯🇵 Japan", file: "japan.png" },
+      { country: "🇩🇪 Germany", file: "germany.png" },
+      { country: "🇺🇸 United States", file: "united-states.png" } // correct
+    ],
+    correctIndex: 3,
+    explanation: "The United States has the world’s largest economy in terms of nominal GDP."
+  },
+
+  {
+    id: 2,
+    text: "Which country has the highest GDP per capita?",
+    options: [
+      { country: "🇳🇴 Norway", file: "norway.png" },
+      { country: "🇱🇺 Luxembourg", file: "luxembourg.png" }, // correct
+      { country: "🇨🇭 Switzerland", file: "switzerland.png" },
+      { country: "🇸🇬 Singapore", file: "singapore.png" }
+    ],
+    correctIndex: 1,
+    explanation: "Luxembourg’s small population and strong financial sector give it very high GDP per person."
+  },
+
+  {
+    id: 3,
+    text: "Which country among these has higher income inequality?",
+    options: [
+      { country: "🇧🇷 Brazil", file: "brazil.png" }, // correct
+      { country: "🇨🇳 China", file: "china.png" },
+      { country: "🇩🇪 Germany", file: "germany.png" },
+      { country: "🇳🇴 Norway", file: "norway.png" }
+    ],
+    correctIndex: 0,
+    explanation: "Brazil has relatively high income inequality compared with the other countries listed."
+  },
+
+  {
+    id: 5,
+    text: "Which country has the highest national debt as a percentage of GDP?",
+    options: [
+      { country: "🇺🇸 United States", file: "united-states.png" },
+      { country: "🇬🇷 Greece", file: "greece.png" },
+      { country: "🇯🇵 Japan", file: "japan.png" }, // correct
+      { country: "🇮🇹 Italy", file: "italy.png" }
+    ],
+    correctIndex: 2,
+    explanation: "Japan’s public debt is more than twice its GDP, one of the highest ratios in the world."
+  },
+
+  {
+    id: 6,
+    text: "Which country has one of the lowest unemployment rates?",
+    options: [
+      { country: "🇶🇦 Qatar", file: "qatar.png" }, // correct
+      { country: "🇩🇪 Germany", file: "germany.png" },
+      { country: "🇨🇦 Canada", file: "canada.png" },
+      { country: "🇨🇭 Switzerland", file: "switzerland.png" }
+    ],
+    correctIndex: 0,
+    explanation: "Qatar’s labour market structure leads to extremely low measured unemployment."
+  },
+
+  {
+    id: 11,
+    text: "According to the Big Mac Index, which country often has one of the highest Big Mac prices?",
+    options: [
+      { country: "🇨🇭 Switzerland", file: "switzerland.png" }, // correct
+      { country: "🇨🇳 China", file: "china.png" },
+      { country: "🇭🇰 Hong Kong", file: "hong-kong.png" },
+      { country: "🇮🇩 Indonesia", file: "indonesia.png" }
+    ],
+    correctIndex: 0,
+    explanation: "Switzerland usually has one of the most expensive Big Macs, showing a strong currency and high price level."
+  },
+
+  {
+    id: 13,
+    text: "Which country has the highest number of billionaires?",
+    options: [
+      { country: "🇫🇷 France", file: "france.png" },
+      { country: "🇺🇸 United States", file: "united-states.png" }, // correct
+      { country: "🇩🇪 Germany", file: "germany.png" },
+      { country: "🇨🇦 Canada", file: "canada.png" }
+    ],
+    correctIndex: 1,
+    explanation: "The United States leads the world in number of billionaires, driven by tech, finance and other industries."
+  },
+
+  {
+    id: 16,
+    text: "Which country among the following has one of the lowest minimum wages (in HKD terms)?",
+    options: [
+      { country: "🇺🇸 United States", file: "united-states.png" },
+      { country: "🇬🇧 United Kingdom", file: "united-kingdom.png" },
+      { country: "🇵🇭 Philippines", file: "philippines.png" }, // correct
+      { country: "🇦🇺 Australia", file: "australia.png" }
+    ],
+    correctIndex: 2,
+    explanation: "The Philippines has a much lower statutory minimum wage than the other countries listed, when converted into HKD."
+  }
+];
 
     // --------- DOM ELEMENTS ---------
 
