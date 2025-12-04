@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>The World’s Most – Economics Flag Game</title>
+  <title>The World's Most – Economics Flag Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Fun Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&display=swap" rel="stylesheet" />
   <style>
     * {
       box-sizing: border-box;
@@ -11,448 +13,507 @@
       padding: 0;
     }
 
-    body {
-      font-family: "Comic Sans MS", "Baloo 2", system-ui, -apple-system,
-        BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #000;
+    html, body {
+      height: 100%;
+      width: 100%;
       overflow: hidden;
     }
 
-    .screen {
-      position: fixed;
-      inset: 0;
+    body {
+      font-family: "Baloo 2", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #000;
+      color: #fff;
+    }
+
+    #app {
       width: 100vw;
       height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ---------- SHARED SCREENS ---------- */
+
+    .screen {
+      position: absolute;
+      inset: 0;
       display: none;
-    }
-
-    /* START PAGE */
-    #start-screen {
-      display: flex; /* shown first */
-      background: url("images/start-page.png") center center / cover no-repeat;
-      cursor: pointer;
-    }
-
-    /* INSTRUCTION PAGE */
-    #instruction-screen {
-      background: url("images/instruction.png") center center / cover no-repeat;
-      cursor: pointer;
-    }
-
-    /* GAME SCREEN */
-    #game-screen {
-      display: none;
-      background: url("images/background.png") center center / cover no-repeat;
-      color: #fff;
-      padding: 16px;
-      display: none;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: stretch;
-    }
-
-    .hud {
-      display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      font-size: 20px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-      margin-bottom: 8px;
     }
 
-    #question-text {
-      font-size: 26px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 8px;
-      padding: 4px 10px;
-      text-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+    .screen.active {
+      display: flex;
+    }
+
+    .full-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ---------- GAME SCREEN ---------- */
+
+    #game-screen {
+      background: #000;
+      flex-direction: column;
     }
 
     #game-area {
       position: relative;
-      flex: 1;
-      margin-top: 8px;
-      border-radius: 20px;
+      width: 100%;
+      height: 100%;
+      background-image: url("images/background.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       overflow: hidden;
-      /* transparent so background image shows through */
     }
 
-    /* FALLING FLAGS */
+    .hud {
+      position: absolute;
+      top: 12px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 26px;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.7);
+      pointer-events: none;
+    }
+
+    #score-display {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      font-size: 22px;
+    }
+
+    .question-text {
+      margin-top: 40px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    /* falling flags */
+
     .flag {
       position: absolute;
-      top: -150px;
-      width: 120px;
-      height: 120px;
+      top: -160px;
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
-      object-fit: cover;
-      pointer-events: none;
-      user-select: none;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-    }
-
-    /* BASKET */
-    #basket {
-      position: absolute;
-      bottom: 16px;
-      width: 170px;
-      height: 90px;
-      border-radius: 999px;
-      background: rgba(255, 140, 0, 0.92);
+      overflow: hidden;
+      background: rgba(255,255,255,0.9);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 56px;
-      color: #fff;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.45);
+      pointer-events: none;
+      user-select: none;
     }
+
+    .flag img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #basket {
+      position: absolute;
+      bottom: 20px;
+      width: 160px;
+      height: 160px;
+      border-radius: 40px;
+      background: #ff8c32;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      font-size: 70px;
+      user-select: none;
+      touch-action: none;
+    }
+
+    /* Legend of country names at bottom */
 
     #options-legend {
-      margin-top: 8px;
-      font-size: 14px;
-      background: rgba(0, 0, 0, 0.55);
-      border-radius: 14px;
-      padding: 8px 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    #options-legend span {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.09);
-      white-space: nowrap;
-    }
-
-    .legend-flag {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-right: 4px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 8px;
+      padding: 8px 16px;
+      background: rgba(0,0,0,0.55);
+      font-size: 18px;
+      text-align: center;
+      white-space: normal;
     }
 
     #message {
-      margin-top: 6px;
-      min-height: 32px;
-      font-size: 16px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 80px;
+      max-width: 90%;
+      text-align: center;
+      font-size: 20px;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.8);
     }
 
     .correct {
-      color: #bbff99;
+      color: #bbff8c;
     }
 
     .wrong {
-      color: #ffd1d1;
+      color: #ffd0d0;
     }
 
-    #result-screen {
-      margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(0, 0, 0, 0.7);
-      border: 2px solid #ffe45c;
+    /* RESULT / CONGRATS */
+
+    #result-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.08), rgba(0,0,0,0.9));
       display: none;
-      font-size: 18px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
+      padding: 16px;
+    }
+
+    #result-overlay.show {
+      display: flex;
+      animation: popIn 0.5s ease-out;
     }
 
     #result-title {
-      font-size: 28px;
-      font-weight: 900;
-      margin-bottom: 4px;
-      color: #ffe45c;
-      text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
+      font-size: 52px;
+      margin-bottom: 12px;
+      background: linear-gradient(90deg, #fffb8f, #ff9cf3, #8df7ff);
+      -webkit-background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 18px rgba(255,255,255,0.35);
     }
 
-    .gift {
-      margin-top: 6px;
-      font-weight: 700;
-      color: #c4ffb3;
+    #result-detail {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    #gift-message {
+      font-size: 24px;
+      margin-top: 4px;
     }
 
     .btn-row {
+      margin-top: 16px;
       display: flex;
-      justify-content: center;
       gap: 10px;
-      margin-top: 10px;
       flex-wrap: wrap;
+      justify-content: center;
     }
 
     button {
-      padding: 10px 18px;
+      padding: 10px 20px;
       border-radius: 999px;
       border: none;
+      font-size: 18px;
       cursor: pointer;
-      font-size: 16px;
-      background: #ff9f1c;
-      color: #222;
-      font-weight: 700;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-      transition: transform 0.07s ease, box-shadow 0.07s ease,
-        background 0.1s ease;
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
-      background: #ffb648;
+      background: #2563eb;
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+      font-family: "Baloo 2", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     button:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+      transform: translateY(1px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.5);
     }
 
     .controls-hint {
-      font-size: 12px;
+      position: absolute;
+      bottom: 40px;
+      width: 100%;
       text-align: center;
-      margin-top: 4px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+      font-size: 16px;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.8);
     }
 
-    @media (max-width: 700px) {
-      #question-text {
-        font-size: 22px;
+    @keyframes popIn {
+      from {
+        transform: scale(0.6);
+        opacity: 0;
       }
-      #basket {
-        width: 150px;
-        height: 80px;
-        font-size: 50px;
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .question-text {
+        font-size: 22px;
+        margin-top: 30px;
+      }
+      #score-display {
+        font-size: 18px;
       }
       .flag {
-        width: 110px;
-        height: 110px;
+        width: 120px;
+        height: 120px;
+      }
+      #basket {
+        width: 140px;
+        height: 140px;
+        font-size: 60px;
+      }
+      #options-legend {
+        font-size: 16px;
       }
     }
   </style>
 </head>
 <body>
-  <!-- SCREENS -->
-  <div id="start-screen" class="screen"></div>
-
-  <div id="instruction-screen" class="screen"></div>
-
-  <div id="game-screen" class="screen">
-    <div class="hud">
-      <div id="question-counter">Question 1 / 8</div>
-      <div id="score-display">Correct: 0</div>
+  <div id="app">
+    <!-- START SCREEN -->
+    <div id="start-screen" class="screen active">
+      <img src="images/start-page.png" alt="The World's Most start page" class="full-image" />
     </div>
 
-    <div id="question-text"></div>
-
-    <div id="game-area">
-      <div id="basket">🧺</div>
+    <!-- INSTRUCTION SCREEN -->
+    <div id="instruction-screen" class="screen">
+      <img src="images/instruction.png" alt="Game instructions" class="full-image" />
     </div>
 
-    <div id="options-legend"></div>
-    <div id="message"></div>
-
-    <div id="result-screen">
-      <div id="result-title"></div>
-      <div id="result-detail"></div>
-      <div class="gift" id="gift-message"></div>
-      <div class="btn-row">
-        <button id="play-again">Play Again</button>
-        <button id="back-to-start">Back to Start</button>
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="screen">
+      <div id="game-area">
+        <div class="hud">
+          <div class="question-text" id="question-text"></div>
+          <div id="score-display">Correct: 0</div>
+        </div>
+        <div id="basket">🧺</div>
+        <div id="options-legend"></div>
+        <div id="message"></div>
+        <div class="controls-hint">
+          Drag the basket with your finger (iPad) or mouse (computer) to catch the correct flag!
+        </div>
+        <div id="result-overlay">
+          <div id="result-title">CONGRATULATIONS!</div>
+          <div id="result-detail"></div>
+          <div id="gift-message"></div>
+          <div class="btn-row">
+            <button id="play-again">Play Again</button>
+            <button id="back-to-start">Back to Start</button>
+          </div>
+        </div>
       </div>
     </div>
-
-    <p class="controls-hint">
-      Move the basket by dragging with your finger (iPad) or mouse (desktop) and
-      catch the correct flag!
-    </p>
   </div>
 
+  <!-- Background music -->
+  <audio id="bg-music" src="background-music.mp3" loop></audio>
+
   <script>
-    // ----------------- QUESTION DATA (8 QUESTIONS) -----------------
+    // --------- QUESTION DATA (8 QUESTIONS) ---------
+
     const QUESTIONS = [
       {
         id: 1,
         text: "Which country has the highest GDP in the world?",
         options: [
-          { country: "China", image: "china.png" },
-          { country: "Japan", image: "japan.png" },
-          { country: "Germany", image: "germany.png" },
-          { country: "United States", image: "united-states.png" } // correct
+          { country: "China", file: "china.png" },
+          { country: "Japan", file: "japan.png" },
+          { country: "Germany", file: "germany.png" },
+          { country: "United States", file: "united-states.png" } // correct
         ],
         correctIndex: 3,
-        explanation:
-          "The United States has the world’s largest economy in terms of nominal GDP."
+        explanation: "The United States has the world’s largest economy in terms of nominal GDP."
       },
       {
         id: 2,
         text: "Which country has the highest GDP per capita?",
         options: [
-          { country: "Norway", image: "norway.png" },
-          { country: "Luxembourg", image: "luxembourg.png" }, // correct
-          { country: "Switzerland", image: "switzerland.png" },
-          { country: "Singapore", image: "singapore.png" }
+          { country: "Norway", file: "norway.png" },
+          { country: "Luxembourg", file: "luxembourg.png" }, // correct
+          { country: "Switzerland", file: "switzerland.png" },
+          { country: "Singapore", file: "singapore.png" }
         ],
         correctIndex: 1,
-        explanation:
-          "Luxembourg’s small population and strong financial sector give it very high GDP per person."
+        explanation: "Luxembourg’s small population and strong financial sector give it very high GDP per person."
       },
       {
         id: 3,
-        text:
-          "Which country has the highest level of income inequality among the following?",
+        text: "Which country among these has higher income inequality?",
         options: [
-          { country: "Brazil", image: "brazil.png" }, // correct
-          { country: "Germany", image: "germany.png" },
-          { country: "Norway", image: "norway.png" },
-          { country: "Japan", image: "japan.png" }
+          { country: "Brazil", file: "brazil.png" }, // correct
+          { country: "China", file: "china.png" },
+          { country: "Germany", file: "germany.png" },
+          { country: "Norway", file: "norway.png" }
         ],
         correctIndex: 0,
-        explanation:
-          "Brazil is well known for having a high level of income inequality compared with other countries listed."
+        explanation: "Brazil has relatively high income inequality compared with the other countries listed."
       },
       {
         id: 5,
         text: "Which country has the highest national debt as a percentage of GDP?",
         options: [
-          { country: "United States", image: "united-states.png" },
-          { country: "Greece", image: "greece.png" },
-          { country: "Japan", image: "japan.png" }, // correct
-          { country: "Italy", image: "italy.png" }
+          { country: "United States", file: "united-states.png" },
+          { country: "Greece", file: "greece.png" },
+          { country: "Japan", file: "japan.png" }, // correct
+          { country: "Italy", file: "italy.png" }
         ],
         correctIndex: 2,
-        explanation:
-          "Japan’s public debt is more than twice its GDP, one of the highest ratios in the world."
+        explanation: "Japan’s public debt is more than twice its GDP, one of the highest ratios in the world."
       },
       {
         id: 6,
         text: "Which country has one of the lowest unemployment rates?",
         options: [
-          { country: "Qatar", image: "qatar.png" }, // correct
-          { country: "Germany", image: "germany.png" },
-          { country: "Canada", image: "canada.png" },
-          { country: "Switzerland", image: "switzerland.png" }
+          { country: "Qatar", file: "qatar.png" }, // correct
+          { country: "Germany", file: "germany.png" },
+          { country: "Canada", file: "canada.png" },
+          { country: "Switzerland", file: "switzerland.png" }
         ],
         correctIndex: 0,
-        explanation:
-          "Qatar’s labour market structure leads to extremely low measured unemployment."
+        explanation: "Qatar’s labour market structure leads to extremely low measured unemployment."
       },
       {
         id: 11,
-        text:
-          "According to the Big Mac Index, which country often has one of the highest Big Mac prices?",
+        text: "According to the Big Mac Index, which country often has one of the highest Big Mac prices?",
         options: [
-          { country: "Switzerland", image: "switzerland.png" }, // correct
-          { country: "China", image: "china.png" },
-          { country: "Indonesia", image: "indonesia.png" },
-          { country: "Hong Kong", image: "hong-kong.png" }
+          { country: "Switzerland", file: "switzerland.png" }, // correct
+          { country: "China", file: "china.png" },
+          { country: "Hong Kong", file: "hong-kong.png" },
+          { country: "Indonesia", file: "indonesia.png" }
         ],
         correctIndex: 0,
-        explanation:
-          "Switzerland usually has one of the most expensive Big Macs, showing a strong currency and high price level."
+        explanation: "Switzerland usually has one of the most expensive Big Macs, showing a strong currency and high price level."
       },
       {
         id: 13,
         text: "Which country has the highest number of billionaires?",
         options: [
-          { country: "China", image: "china.png" },
-          { country: "United States", image: "united-states.png" }, // correct
-          { country: "Germany", image: "germany.png" },
-          { country: "United Kingdom", image: "united-kingdom.png" }
+          { country: "France", file: "france.png" },
+          { country: "United States", file: "united-states.png" }, // correct
+          { country: "Germany", file: "germany.png" },
+          { country: "Canada", file: "canada.png" }
         ],
         correctIndex: 1,
-        explanation:
-          "The United States leads the world in number of billionaires, driven by tech, finance and other industries."
+        explanation: "The United States leads the world in number of billionaires, driven by tech, finance and other industries."
       },
       {
         id: 16,
-        text:
-          "Which country among the following has one of the lowest minimum wages (in HKD terms)?",
+        text: "Which country among the following has one of the lowest minimum wages (in HKD terms)?",
         options: [
-          { country: "Australia", image: "australia.png" },
-          { country: "United Kingdom", image: "united-kingdom.png" },
-          { country: "Philippines", image: "philippines.png" }, // correct
-          { country: "United States", image: "united-states.png" }
+          { country: "United States", file: "united-states.png" },
+          { country: "United Kingdom", file: "united-kingdom.png" },
+          { country: "Philippines", file: "philippines.png" }, // correct
+          { country: "Australia", file: "australia.png" }
         ],
         correctIndex: 2,
-        explanation:
-          "The Philippines has a much lower statutory minimum wage than the other countries listed when converted into HKD."
+        explanation: "The Philippines has a much lower statutory minimum wage than the other countries listed, when converted into HKD."
       }
     ];
 
-    // ----------------- ELEMENTS -----------------
+    // --------- DOM ELEMENTS ---------
+
     const startScreen = document.getElementById("start-screen");
     const instructionScreen = document.getElementById("instruction-screen");
     const gameScreen = document.getElementById("game-screen");
-
-    const questionCounterEl = document.getElementById("question-counter");
-    const scoreDisplayEl = document.getElementById("score-display");
-    const questionTextEl = document.getElementById("question-text");
     const gameArea = document.getElementById("game-area");
     const basket = document.getElementById("basket");
+    const questionTextEl = document.getElementById("question-text");
+    const scoreDisplayEl = document.getElementById("score-display");
     const optionsLegendEl = document.getElementById("options-legend");
     const messageEl = document.getElementById("message");
-    const resultScreen = document.getElementById("result-screen");
+    const resultOverlay = document.getElementById("result-overlay");
     const resultTitleEl = document.getElementById("result-title");
     const resultDetailEl = document.getElementById("result-detail");
     const giftMessageEl = document.getElementById("gift-message");
     const playAgainBtn = document.getElementById("play-again");
     const backToStartBtn = document.getElementById("back-to-start");
+    const bgMusic = document.getElementById("bg-music");
 
-    // ----------------- GAME STATE -----------------
+    // --------- GAME STATE ---------
+
     let currentIndex = 0;
     let score = 0;
     let fallingFlags = [];
     let animationInterval = null;
     let questionActive = false;
     let basketX = 0;
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let audioCtx = null;
 
-    // ----------------- HELPERS -----------------
-    function resetGame() {
+    // --------- SCREEN HANDLING ---------
+
+    function showScreen(screenEl) {
+      [startScreen, instructionScreen, gameScreen].forEach(s => s.classList.remove("active"));
+      screenEl.classList.add("active");
+    }
+
+    // click start -> instruction
+    startScreen.addEventListener("click", () => {
+      showScreen(instructionScreen);
+    });
+    startScreen.addEventListener("touchstart", () => {
+      showScreen(instructionScreen);
+    }, { passive: true });
+
+    // instruction -> game
+    instructionScreen.addEventListener("click", () => {
+      startGame();
+    });
+    instructionScreen.addEventListener("touchstart", () => {
+      startGame();
+    }, { passive: true });
+
+    // --------- GAME LOGIC ---------
+
+    function resetGameState() {
       clearInterval(animationInterval);
       animationInterval = null;
       currentIndex = 0;
       score = 0;
-      fallingFlags.forEach((f) => {
-        if (f.el && f.el.parentNode) f.el.parentNode.removeChild(f.el);
-      });
+      fallingFlags.forEach(f => f.el.remove());
       fallingFlags = [];
       messageEl.textContent = "";
       messageEl.className = "";
-      resultScreen.style.display = "none";
+      optionsLegendEl.textContent = "";
+      resultOverlay.classList.remove("show");
       updateScoreDisplay();
-      setTimeout(centerBasket, 50);
+    }
+
+    function startGame() {
+      showScreen(gameScreen);
+      playBackgroundMusic();
+      resetGameState();
+
+      // center basket
+      setTimeout(() => {
+        const areaWidth = gameArea.clientWidth;
+        basketX = (areaWidth - basket.offsetWidth) / 2;
+        updateBasketPosition();
+      }, 0);
+
+      loadQuestion();
     }
 
     function updateScoreDisplay() {
       scoreDisplayEl.textContent = `Correct: ${score}`;
     }
 
-    function centerBasket() {
-      const areaWidth = gameArea.clientWidth;
-      basketX = (areaWidth - basket.offsetWidth) / 2;
-      updateBasketPosition();
-    }
-
-    function updateBasketPosition() {
-      const areaWidth = gameArea.clientWidth;
-      const maxX = areaWidth - basket.offsetWidth - 4;
-      if (basketX < 4) basketX = 4;
-      if (basketX > maxX) basketX = maxX;
-      basket.style.left = basketX + "px";
-    }
-
     function loadQuestion() {
       clearInterval(animationInterval);
       animationInterval = null;
 
-      fallingFlags.forEach((f) => {
-        if (f.el && f.el.parentNode) f.el.parentNode.removeChild(f.el);
-      });
+      fallingFlags.forEach(f => f.el.remove());
       fallingFlags = [];
       messageEl.textContent = "";
       messageEl.className = "";
-      optionsLegendEl.innerHTML = "";
 
       if (currentIndex >= QUESTIONS.length) {
         endGame();
@@ -462,46 +523,35 @@
       const q = QUESTIONS[currentIndex];
       questionActive = true;
 
-      questionCounterEl.textContent = `Question ${currentIndex + 1} / ${
-        QUESTIONS.length
-      }`;
-      questionTextEl.textContent = q.text;
+      questionTextEl.textContent = `Question ${currentIndex + 1} / ${QUESTIONS.length} – ${q.text}`;
 
-      // Legend / footnotes
-      q.options.forEach((opt) => {
-        const span = document.createElement("span");
-        const img = document.createElement("img");
-        img.src = "images/" + opt.image;
-        img.className = "legend-flag";
-        span.appendChild(img);
-        const label = document.createElement("span");
-        label.textContent = " " + opt.country;
-        span.appendChild(label);
-        optionsLegendEl.appendChild(span);
-      });
+      // legend text at bottom
+      optionsLegendEl.textContent = q.options.map(o => o.country).join("   ");
 
       const areaWidth = gameArea.clientWidth;
       const areaHeight = gameArea.clientHeight;
 
-      // Create falling flags
       q.options.forEach((opt, index) => {
+        const el = document.createElement("div");
+        el.className = "flag";
         const img = document.createElement("img");
-        img.className = "flag";
-        img.src = "images/" + opt.image;
-        gameArea.appendChild(img);
+        img.src = "images/" + opt.file;
+        img.alt = opt.country + " flag";
+        el.appendChild(img);
+        gameArea.appendChild(el);
 
-        const flagWidth = 120;
-        const x =
-          Math.random() * (areaWidth - flagWidth - 40) + 20 + index * 5; // slight spread
-        const speed = 1 + Math.random() * 1.3;
+        const flagWidth = el.offsetWidth || 140;
+        const margin = 40;
+        const x = Math.random() * (areaWidth - flagWidth - margin * 2) + margin;
+        const speed = 1.2 + Math.random() * 1.2;
 
-        img.style.left = x + "px";
-        img.style.top = "-150px";
+        el.style.left = x + "px";
+        el.style.top = "-160px";
 
         fallingFlags.push({
-          el: img,
+          el,
           x,
-          y: -150,
+          y: -160,
           speed,
           isCorrect: index === q.correctIndex,
           option: opt
@@ -513,21 +563,12 @@
       }, 30);
     }
 
-    function isIntersecting(rect1, rect2) {
-      return !(
-        rect1.right < rect2.left ||
-        rect1.left > rect2.right ||
-        rect1.bottom < rect2.top ||
-        rect1.top > rect2.bottom
-      );
-    }
-
     function updateFlags(areaHeight) {
       if (!questionActive) return;
 
       const basketRect = basket.getBoundingClientRect();
 
-      fallingFlags.forEach((flag) => {
+      fallingFlags.forEach(flag => {
         flag.y += flag.speed;
         flag.el.style.top = flag.y + "px";
 
@@ -537,67 +578,66 @@
         }
       });
 
-      fallingFlags = fallingFlags.filter((flag) => {
+      // remove flags that fall out of screen
+      fallingFlags = fallingFlags.filter(flag => {
         if (flag.y > areaHeight + 200) {
-          if (flag.el && flag.el.parentNode) {
-            flag.el.parentNode.removeChild(flag.el);
-          }
+          flag.el.remove();
           return false;
         }
         return true;
       });
 
+      // if everything fell and still active -> move on
       if (fallingFlags.length === 0 && questionActive) {
         questionActive = false;
         const q = QUESTIONS[currentIndex];
         const correctOption = q.options[q.correctIndex];
-        messageEl.textContent =
-          "⏳ Time’s up for this question. The correct flag was " +
-          correctOption.country +
-          ". " +
-          q.explanation;
+        playWrongSound();
+        messageEl.textContent = `⏳ The flags disappeared. The correct flag was ${correctOption.country}. ${q.explanation}`;
         messageEl.className = "wrong";
         setTimeout(() => {
           currentIndex++;
           loadQuestion();
-        }, 2200);
+        }, 2600);
       }
     }
 
-    function handleFlagCaught(flag) {
-      if (!questionActive) return;
+    function isIntersecting(r1, r2) {
+      return !(
+        r1.right < r2.left ||
+        r1.left > r2.right ||
+        r1.bottom < r2.top ||
+        r1.top > r2.bottom
+      );
+    }
+
+    function handleFlagCaught(flagObj) {
       questionActive = false;
       clearInterval(animationInterval);
       animationInterval = null;
 
-      setTimeout(() => {
-        fallingFlags.forEach((f) => {
-          if (f.el && f.el.parentNode) f.el.parentNode.removeChild(f.el);
-        });
-        fallingFlags = [];
-      }, 150);
-
       const q = QUESTIONS[currentIndex];
       const correctOption = q.options[q.correctIndex];
 
-      if (flag.isCorrect) {
+      fallingFlags.forEach(f => f.el.remove());
+      fallingFlags = [];
+
+      if (flagObj.isCorrect) {
         score++;
         updateScoreDisplay();
+        playCorrectSound();
         messageEl.textContent = "✅ Correct! " + q.explanation;
         messageEl.className = "correct";
       } else {
-        messageEl.textContent =
-          "❌ Not quite. The correct flag was " +
-          correctOption.country +
-          ". " +
-          q.explanation;
+        playWrongSound();
+        messageEl.textContent = `❌ Not quite. The correct flag was ${correctOption.country}. ${q.explanation}`;
         messageEl.className = "wrong";
       }
 
       setTimeout(() => {
         currentIndex++;
         loadQuestion();
-      }, 2600); // a few seconds so students can read
+      }, 2800); // a few seconds to read
     }
 
     function endGame() {
@@ -605,82 +645,121 @@
       clearInterval(animationInterval);
       animationInterval = null;
 
-      resultScreen.style.display = "block";
-      resultTitleEl.textContent = "CONGRATULATIONS!";
-      resultDetailEl.textContent = `You answered ${score} out of ${
-        QUESTIONS.length
-      } questions correctly.`;
-
+      resultDetailEl.textContent = `You answered ${score} out of ${QUESTIONS.length} questions correctly.`;
       if (score >= 3) {
-        giftMessageEl.textContent =
-          "🎁 You win a small gift! Please collect it from the booth!";
+        resultTitleEl.textContent = "CONGRATULATIONS!";
+        giftMessageEl.textContent = "🎁 You win a small gift! Please collect it from the booth.";
       } else {
-        giftMessageEl.textContent =
-          "Keep trying! Get 3 or more correct next time to win a gift.";
+        resultTitleEl.textContent = "GOOD TRY!";
+        giftMessageEl.textContent = "Try again and get 3 or more correct to win a gift!";
       }
+      resultOverlay.classList.add("show");
+      playApplause();
     }
-
-    // ----------------- CONTROLS: MOUSE + TOUCH -----------------
-    function handlePointerMove(evt) {
-      const rect = gameArea.getBoundingClientRect();
-      let clientX;
-      if (evt.touches && evt.touches.length > 0) {
-        clientX = evt.touches[0].clientX;
-      } else {
-        clientX = evt.clientX;
-      }
-      basketX = clientX - rect.left - basket.offsetWidth / 2;
-      updateBasketPosition();
-    }
-
-    gameArea.addEventListener("mousemove", handlePointerMove);
-    gameArea.addEventListener(
-      "touchstart",
-      (e) => {
-        e.preventDefault();
-        handlePointerMove(e);
-      },
-      { passive: false }
-    );
-    gameArea.addEventListener(
-      "touchmove",
-      (e) => {
-        e.preventDefault();
-        handlePointerMove(e);
-      },
-      { passive: false }
-    );
-
-    window.addEventListener("resize", centerBasket);
-
-    // ----------------- SCREEN TRANSITIONS -----------------
-    startScreen.addEventListener("click", () => {
-      startScreen.style.display = "none";
-      instructionScreen.style.display = "block";
-    });
-
-    instructionScreen.addEventListener("click", () => {
-      instructionScreen.style.display = "none";
-      gameScreen.style.display = "flex";
-      resetGame();
-      loadQuestion();
-    });
 
     playAgainBtn.addEventListener("click", () => {
-      resetGame();
-      loadQuestion();
+      resultOverlay.classList.remove("show");
+      startGame();
     });
 
     backToStartBtn.addEventListener("click", () => {
-      gameScreen.style.display = "none";
-      resultScreen.style.display = "none";
-      startScreen.style.display = "block";
+      resultOverlay.classList.remove("show");
+      showScreen(startScreen);
     });
 
-    // Initial center basket once layout is ready
-    window.addEventListener("load", () => {
-      centerBasket();
-    });
+    // --------- BASKET DRAG (MOUSE + TOUCH via Pointer Events) ---------
+
+    function updateBasketPosition() {
+      const areaRect = gameArea.getBoundingClientRect();
+      const maxX = areaRect.width - basket.offsetWidth - 8;
+      if (basketX < 8) basketX = 8;
+      if (basketX > maxX) basketX = maxX;
+      basket.style.left = basketX + "px";
+    }
+
+    function pointerDown(e) {
+      isDragging = true;
+      const areaRect = gameArea.getBoundingClientRect();
+      const pointerX = e.clientX - areaRect.left;
+      const basketRect = basket.getBoundingClientRect();
+      const basketLeft = basketRect.left - areaRect.left;
+      dragOffsetX = pointerX - basketLeft;
+      e.preventDefault();
+    }
+
+    function pointerMove(e) {
+      if (!isDragging) return;
+      const areaRect = gameArea.getBoundingClientRect();
+      const pointerX = e.clientX - areaRect.left;
+      basketX = pointerX - dragOffsetX;
+      updateBasketPosition();
+      e.preventDefault();
+    }
+
+    function pointerUp() {
+      isDragging = false;
+    }
+
+    basket.addEventListener("pointerdown", pointerDown);
+    window.addEventListener("pointermove", pointerMove);
+    window.addEventListener("pointerup", pointerUp);
+
+    // --------- SOUND EFFECTS ---------
+
+    function ensureAudioCtx() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
+      }
+    }
+
+    function playTone(freq, duration, type = "sine", volume = 0.3) {
+      ensureAudioCtx();
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playCorrectSound() {
+      playTone(900, 0.25, "square", 0.4);
+    }
+
+    function playWrongSound() {
+      playTone(220, 0.35, "sawtooth", 0.32);
+    }
+
+    function playApplause() {
+      // quick rising chirp as a simple "applause-like" effect
+      ensureAudioCtx();
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+      osc.frequency.linearRampToValueAtTime(900, audioCtx.currentTime + 0.6);
+      gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.8);
+    }
+
+    function playBackgroundMusic() {
+      // must be triggered by user gesture; this is called from instruction-screen click
+      bgMusic.volume = 0.45;
+      bgMusic.play().catch(() => {
+        // ignore if browser blocks; will start after next interaction automatically
+      });
+    }
   </script>
 </body>
 </html>
