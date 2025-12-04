@@ -7,434 +7,311 @@
   <style>
     * {
       box-sizing: border-box;
-    }
-
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
       padding: 0;
-      background: #0f172a;
-      color: #111827;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #000;
+      color: #fff;
+    }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #start-screen,
+    #instruction-screen {
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    #start-screen {
+      background-image: url("images/start-page.jpg");
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
+      align-items: center;
     }
 
-    .container {
-      max-width: 960px;
-      width: 100%;
-      padding: 16px;
-    }
-
-    h1, h2, h3 {
-      margin: 0;
-      text-align: center;
-    }
-
-    .subtitle {
-      text-align: center;
-      margin-top: 8px;
-      margin-bottom: 16px;
-      color: #334155;
-      font-size: 15px;
-    }
-
-    /* HERO / START PAGE */
-
-    #intro-screen {
-      display: block;
+    #instruction-screen {
+      background-image: url("images/instruction.png");
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
     }
 
     #game-screen {
       display: none;
     }
 
-    .hero {
-      position: relative;
-      border-radius: 18px;
-      overflow: hidden;
-      margin-bottom: 16px;
-      box-shadow: 0 8px 24px rgba(15,23,42,0.5);
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: url("images/start-page.jpeg") center/cover no-repeat;
-      transform: scale(1.02);
-    }
-
-    .hero-overlay {
-      position: relative;
-      padding: 40px 20px;
-      text-align: center;
-      color: #fff;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-      background: linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.55));
-    }
-
-    .hero-title {
-      font-size: 40px;
-      letter-spacing: 2px;
-      margin-bottom: 6px;
-    }
-
-    .hero-subtitle {
-      font-size: 16px;
-      max-width: 520px;
-      margin: 0 auto;
-    }
-
-    .btn-row {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin: 18px 0 22px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      padding: 12px 26px;
+    .play-button {
+      padding: 18px 40px;
+      font-size: 32px;
+      font-weight: 700;
       border-radius: 999px;
       border: none;
       cursor: pointer;
-      font-size: 16px;
-      background: #f97316;
+      background: linear-gradient(135deg, #f97316, #ec4899);
       color: #fff;
-      box-shadow: 0 6px 14px rgba(124,45,18,0.35);
-      font-weight: 600;
-      transition: transform 0.08s ease, box-shadow 0.1s ease, background 0.1s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      text-transform: uppercase;
+      letter-spacing: 2px;
     }
 
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(124,45,18,0.45);
-      background: #ea580c;
+    .play-button:active {
+      transform: translateY(2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
     }
 
-    button:active {
-      transform: translateY(0);
-      box-shadow: 0 4px 10px rgba(124,45,18,0.45);
-    }
-
-    .btn-large {
-      font-size: 18px;
-      padding: 14px 34px;
-    }
-
-    .concepts {
-      background: #f9fafb;
-      border-radius: 16px;
-      padding: 14px 18px;
-      box-shadow: 0 4px 12px rgba(15,23,42,0.15);
-      margin-bottom: 16px;
-    }
-
-    .concepts h3 {
-      margin-top: 0;
-      text-align: left;
-      font-size: 18px;
-    }
-
-    .concepts ul {
-      margin: 6px 0 0 16px;
-      padding: 0;
-      font-size: 14px;
-      color: #111827;
-    }
-
-    .concepts li {
-      margin-bottom: 4px;
-    }
-
-    .controls-hint {
-      font-size: 13px;
+    .tap-hint {
+      width: 100%;
       text-align: center;
-      margin-top: 6px;
-      color: #4b5563;
+      padding: 20px;
+      font-size: 18px;
+      background: rgba(0,0,0,0.45);
     }
 
-    /* GAME SCREEN */
-
-    .hud {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: #111827;
-    }
-
-    .question-text {
-      font-weight: 600;
-      margin-bottom: 10px;
-      min-height: 44px;
-      font-size: 15px;
-    }
+    /* GAME AREA */
 
     #game-area {
-      position: relative;
-      height: 380px;
-      border-radius: 18px;
-      background: url("images/background.jpeg") center/cover no-repeat;
+      position: absolute;
+      inset: 0;
+      background-image: url("images/background.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       overflow: hidden;
-      box-shadow: 0 6px 18px rgba(15,23,42,0.5);
-      touch-action: none; /* smoother touch control */
+    }
+
+    #question-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 12px 18px;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(15,23,42,0.85), rgba(15,23,42,0.3));
+    }
+
+    #bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      background: linear-gradient(0deg, rgba(15,23,42,0.9), rgba(15,23,42,0.3));
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #score-display {
+      font-weight: 600;
+    }
+
+    #message {
+      min-height: 24px;
+    }
+
+    .correct {
+      color: #4ade80;
+    }
+
+    .wrong {
+      color: #fca5a5;
+    }
+
+    #basket {
+      position: absolute;
+      bottom: 24px;
+      width: 110px;
+      height: 60px;
+      border-radius: 999px;
+      background: rgba(248, 113, 113, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      border: 3px solid rgba(248, 250, 252, 0.8);
     }
 
     .flag {
       position: absolute;
       top: -80px;
-      width: 70px;
-      height: 70px;
+      width: 72px;
+      height: auto;
       pointer-events: none;
       user-select: none;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
     }
 
-    .flag img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      box-shadow: 0 3px 6px rgba(15,23,42,0.4);
-      background: #fff;
-    }
+    /* RESULT OVERLAY */
 
-    #basket {
+    #result-overlay {
       position: absolute;
-      bottom: 12px;
-      width: 90px;
-      height: 55px;
-      border-radius: 26px;
-      background: linear-gradient(180deg,#f97316,#ea580c);
-      display: flex;
+      inset: 0;
+      display: none;
       align-items: center;
       justify-content: center;
-      color: #fff;
-      font-size: 30px;
-      box-shadow: 0 4px 10px rgba(124,45,18,0.6);
-      border: 2px solid rgba(255,255,255,0.6);
-    }
-
-    #options-legend {
-      margin-top: 10px;
-      font-size: 14px;
-      background: #f9fafb;
-      border-radius: 12px;
-      padding: 8px 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .legend-item img {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-    }
-
-    #message {
-      margin-top: 10px;
-      min-height: 34px;
-      font-size: 14px;
-    }
-
-    .correct {
-      color: #15803d;
-    }
-
-    .wrong {
-      color: #b91c1c;
-    }
-
-    #result-screen {
-      margin-top: 16px;
-      padding: 16px 14px;
-      border-radius: 14px;
-      background: radial-gradient(circle at top, #bbf7d0, #ecfdf5);
-      border: 1px solid #22c55e;
-      display: none;
-      font-size: 14px;
+      background: radial-gradient(circle at center, rgba(15,23,42,0.2), rgba(15,23,42,0.9));
+      flex-direction: column;
       text-align: center;
-      position: relative;
-      overflow: hidden;
+      padding: 20px;
     }
 
     #result-title {
-      font-size: 28px;
-      font-weight: 800;
-      margin-bottom: 4px;
-      background: linear-gradient(90deg,#f97316,#ec4899,#22c55e,#0ea5e9);
+      font-size: 52px;
+      font-weight: 900;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #f97316, #facc15, #22c55e, #3b82f6, #a855f7, #ec4899);
       -webkit-background-clip: text;
       color: transparent;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      text-shadow: 0 0 18px rgba(255,255,255,0.6);
+      animation: popGlow 1.4s ease-out infinite alternate;
     }
 
     #result-detail {
-      display: block;
-      margin-bottom: 6px;
-      color: #065f46;
-      font-weight: 500;
+      font-size: 18px;
+      margin-bottom: 8px;
     }
 
-    .gift {
-      margin-top: 4px;
+    #gift-message {
+      font-size: 20px;
       font-weight: 700;
-      color: #166534;
+      margin-bottom: 16px;
     }
 
-    .confetti {
-      position: absolute;
-      width: 8px;
-      height: 14px;
-      background: #f97316;
-      top: -20px;
-      border-radius: 2px;
-      opacity: 0.9;
-      animation: fallConfetti 1.6s linear forwards;
+    .result-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
-    @keyframes fallConfetti {
-      to {
-        transform: translateY(220px) rotate(260deg);
-        opacity: 0;
+    .result-btn {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      background: #22c55e;
+      color: #111827;
+      box-shadow: 0 4px 14px rgba(22,163,74,0.5);
+      font-weight: 600;
+    }
+
+    .result-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 8px rgba(22,163,74,0.7);
+    }
+
+    @keyframes popGlow {
+      0% {
+        transform: scale(1);
+        text-shadow: 0 0 10px rgba(255,255,255,0.5);
+      }
+      100% {
+        transform: scale(1.06);
+        text-shadow: 0 0 20px rgba(255,255,255,0.9);
       }
     }
 
-    .hud-right {
-      text-align: right;
-    }
-
-    @media (max-width: 720px) {
-      #game-area {
-        height: 330px;
+    @media (max-width: 768px) {
+      #question-bar {
+        font-size: 16px;
       }
-      .hero-title {
-        font-size: 32px;
-      }
-      .hero-overlay {
-        padding: 30px 16px;
+      #result-title {
+        font-size: 40px;
       }
     }
   </style>
 </head>
 <body>
-  <audio id="bg-music" src="background-music.mp3" loop></audio>
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <button id="to-instruction" class="play-button">PLAY</button>
+  </div>
 
-  <div class="container">
-    <!-- INTRO SCREEN -->
-    <div id="intro-screen">
-      <div class="hero">
-        <div class="hero-overlay">
-          <div class="hero-title">THE WORLD’S MOST</div>
-          <div class="hero-subtitle">
-            Guess which country is “the most” in different economic categories:
-            GDP, cost of living, inequality, minimum wage and more!
-          </div>
-        </div>
+  <!-- INSTRUCTION SCREEN -->
+  <div id="instruction-screen" class="screen">
+    <div class="tap-hint">Tap anywhere to start the game</div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen">
+    <div id="game-area">
+      <div id="question-bar">
+        <span id="question-text"></span>
       </div>
 
-      <p class="subtitle">
-        Use your finger (iPad) or mouse (computer) to move the basket and catch the correct flag.
-        Get <strong>3 or more</strong> questions correct to win a small gift 🎁!
-      </p>
+      <div id="basket">🧺</div>
 
-      <div class="concepts">
-        <h3>Key Economic Concepts in This Game</h3>
-        <ul>
-          <li><strong>GDP (Gross Domestic Product)</strong>: Total value of goods and services produced in a country.</li>
-          <li><strong>GDP per capita</strong>: GDP divided by population – a rough measure of average income.</li>
-          <li><strong>Income inequality (Gini coefficient)</strong>: How unevenly income is spread across people.</li>
-          <li><strong>Cost of living</strong>: How expensive it is to buy everyday goods and services.</li>
-          <li><strong>Unemployment rate</strong>: Percentage of workers who are jobless but looking for work.</li>
-          <li><strong>Inflation</strong>: How quickly overall prices are rising.</li>
-          <li><strong>Minimum wage</strong>: The lowest legal wage per hour/day set by law.</li>
-          <li><strong>Big Mac Index</strong>: Compares the price of a Big Mac in different countries to show purchasing power.</li>
-        </ul>
+      <div id="bottom-bar">
+        <div id="score-display">Correct: 0</div>
+        <div id="message"></div>
       </div>
 
-      <h3 style="margin-top:10px;">Choose Your Question Set</h3>
-      <p class="controls-hint">
-        Each set has 6 questions. There is <strong>no time limit</strong>, just have fun learning Economics!
-      </p>
-
-      <div class="btn-row">
-        <button class="btn-large" id="start-set-1">PLAY – Set 1</button>
-        <button class="btn-large" id="start-set-2">PLAY – Set 2</button>
-      </div>
-
-      <p class="controls-hint">
-        Controls: drag inside the game area with your <strong>finger</strong> (iPad) or <strong>mouse</strong> (computer)
-        to move the basket. Arrow keys (← →) also work.
-      </p>
-    </div>
-
-    <!-- GAME SCREEN -->
-    <div id="game-screen">
-      <div class="hud">
-        <div id="question-counter">Question 1 / 6</div>
-        <div class="hud-right" id="score-display">Correct: 0</div>
-      </div>
-      <div class="question-text" id="question-text"></div>
-
-      <div id="game-area">
-        <div id="basket">🧺</div>
-      </div>
-
-      <div id="options-legend"></div>
-      <div id="message"></div>
-
-      <div id="result-screen">
+      <div id="result-overlay">
         <div id="result-title">CONGRATULATIONS!</div>
-        <span id="result-detail"></span>
-        <div class="gift" id="gift-message"></div>
-        <div class="btn-row" style="margin-top:12px; justify-content:center;">
-          <button id="play-again-set1">Play Set 1 Again</button>
-          <button id="play-again-set2">Play Set 2 Again</button>
-          <button id="back-to-intro">Back to Start Page</button>
+        <div id="result-detail"></div>
+        <div id="gift-message"></div>
+        <div class="result-buttons">
+          <button class="result-btn" id="play-again">Play Again</button>
+          <button class="result-btn" id="back-to-start">Back to Start</button>
         </div>
       </div>
-
-      <p class="controls-hint">
-        Catch the <strong>correct</strong> flag for each question. One catch = one answer.
-      </p>
     </div>
   </div>
 
   <script>
-    // ------------ QUESTION DATA (PNG FLAGS) ------------
+    // ----------------- QUESTION DATA (8 QUESTIONS) -----------------
 
-    // Helper: we will reference all images from /images/
-    const imgPath = (file) => `images/${file}`;
-
-    const SET1_QUESTIONS = [
+    const QUESTIONS = [
       {
         id: 1,
         text: "Which country has the highest GDP in the world?",
         options: [
-          { country: "China", img: "china.png" },
-          { country: "Japan", img: "japan.png" },
-          { country: "Germany", img: "germany.png" },
-          { country: "United States", img: "united-states.png" } // correct
+          { country: "China", image: "china.png" },
+          { country: "Japan", image: "japan.png" },
+          { country: "Germany", image: "germany.png" },
+          { country: "United States", image: "united-states.png" } // correct
         ],
         correctIndex: 3,
         explanation: "The United States has the world’s largest economy in terms of nominal GDP."
       },
       {
-        id: 3,
-        text: "Which country is known for having one of the highest levels of income inequality?",
+        id: 2,
+        text: "Which country has the highest GDP per capita?",
         options: [
-          { country: "Brazil", img: "brazil.png" },
-          { country: "South Africa", img: "south-africa.png" }, // correct
-          { country: "Canada", img: "canada.png" },
-          { country: "Norway", img: "norway.png" }
+          { country: "Norway", image: "norway.png" },
+          { country: "Luxembourg", image: "luxembourg.png" }, // correct
+          { country: "Switzerland", image: "switzerland.png" },
+          { country: "Singapore", image: "singapore.png" }
+        ],
+        correctIndex: 1,
+        explanation: "Luxembourg’s small population and strong financial sector give it very high GDP per person."
+      },
+      {
+        id: 3,
+        text: "Which country is known for having the highest level of income inequality?",
+        options: [
+          { country: "Brazil", image: "brazil.png" },
+          { country: "South Africa", image: "south-africa.png" }, // correct
+          { country: "Canada", image: "canada.png" },
+          { country: "India", image: "india.png" }
         ],
         correctIndex: 1,
         explanation: "South Africa’s Gini coefficient is among the highest, showing very unequal income distribution."
@@ -443,109 +320,46 @@
         id: 5,
         text: "Which country has the highest national debt as a percentage of GDP?",
         options: [
-          { country: "United States", img: "usa.png" },
-          { country: "Greece", img: "greece.png" },
-          { country: "Japan", img: "japan.png" }, // correct
-          { country: "Italy", img: "italy.png" }
+          { country: "United States", image: "united-states.png" },
+          { country: "Greece", image: "greece.png" },
+          { country: "Japan", image: "japan.png" }, // correct
+          { country: "Italy", image: "italy.png" }
         ],
         correctIndex: 2,
         explanation: "Japan’s public debt is more than twice its GDP, one of the highest ratios in the world."
       },
       {
-        id: 7,
-        text: "Which country has experienced one of the highest inflation rates in recent years?",
-        options: [
-          { country: "Brazil", img: "brazil.png" },
-          { country: "Turkey", img: "turkey.png" },
-          { country: "Venezuela", img: "venezuela.png" }, // correct
-          { country: "Argentina", img: "argentina.png" }
-        ],
-        correctIndex: 2,
-        explanation: "Venezuela has suffered from hyperinflation due to severe economic and political instability."
-      },
-      {
-        id: 9,
-        text: "Which country is known for having a very high youth unemployment rate among developed economies?",
-        options: [
-          { country: "Spain", img: "spain.png" },
-          { country: "Italy", img: "italy.png" },
-          { country: "France", img: "france.png" },
-          { country: "Greece", img: "greece.png" } // correct
-        ],
-        correctIndex: 3,
-        explanation: "Greece has recorded very high youth unemployment rates, especially after the debt crisis."
-      },
-      {
-        id: 11,
-        text: "According to the Big Mac Index, which country often has one of the highest Big Mac prices?",
-        options: [
-          { country: "Switzerland", img: "switzerland.png" }, // correct
-          { country: "China", img: "china.png" },
-          { country: "Indonesia", img: "indonesia.png" },
-          { country: "Philippines", img: "philippines.png" }
-        ],
-        correctIndex: 0,
-        explanation: "Switzerland usually has one of the most expensive Big Macs, showing a strong currency and high price level."
-      }
-    ];
-
-    const SET2_QUESTIONS = [
-      {
-        id: 2,
-        text: "Which country has the highest GDP per capita among the following?",
-        options: [
-          { country: "Norway", img: "norway.png" },
-          { country: "Luxembourg", img: "luxembourg.png" }, // correct
-          { country: "Switzerland", img: "switzerland.png" },
-          { country: "Singapore", img: "singapore.png" }
-        ],
-        correctIndex: 1,
-        explanation: "Luxembourg’s small population and strong financial sector give it very high GDP per person."
-      },
-      {
-        id: 4,
-        text: "Which country is famous for having one of the highest costs of living?",
-        options: [
-          { country: "Japan", img: "japan.png" },
-          { country: "Australia", img: "australia.png" },
-          { country: "Switzerland", img: "switzerland.png" }, // correct
-          { country: "Canada", img: "canada.png" }
-        ],
-        correctIndex: 2,
-        explanation: "Switzerland has very high prices for housing, food and services, making it one of the most expensive places to live."
-      },
-      {
         id: 6,
         text: "Which country has one of the lowest unemployment rates?",
         options: [
-          { country: "Qatar", img: "qatar.png" }, // correct
-          { country: "Germany", img: "germany.png" },
-          { country: "Canada", img: "canada.png" },
-          { country: "Switzerland", img: "switzerland.png" }
+          { country: "Qatar", image: "qatar.png" }, // correct
+          { country: "Germany", image: "germany.png" },
+          { country: "Canada", image: "canada.png" },
+          { country: "Switzerland", image: "switzerland.png" }
         ],
         correctIndex: 0,
         explanation: "Qatar’s labour market structure leads to extremely low measured unemployment."
       },
       {
-        id: 8,
-        text: "Which country has one of the largest trade surpluses?",
+        id: 11,
+        text: "According to the Big Mac Index, which country often has one of the highest Big Mac prices?",
         options: [
-          { country: "China", img: "china.png" }, // correct
-          { country: "Japan", img: "japan.png" },
-          { country: "Germany", img: "germany.png" },
-          { country: "United States", img: "united-states.png" }
+          { country: "Switzerland", image: "switzerland.png" }, // correct
+          { country: "India", image: "india.png" },
+          { country: "China", image: "china.png" },
+          { country: "South Africa", image: "south-africa.png" }
         ],
         correctIndex: 0,
-        explanation: "China exports far more than it imports, producing a very large trade surplus."
+        explanation: "Switzerland usually has one of the most expensive Big Macs, showing a strong currency and high price level."
       },
       {
         id: 13,
         text: "Which country has the highest number of billionaires?",
         options: [
-          { country: "India", img: "india.png" },
-          { country: "United States", img: "United-States.png" }, // correct
-          { country: "Russia", img: "russia.png" },
-          { country: "Germany", img: "germany.png" }
+          { country: "India", image: "india.png" },
+          { country: "United States", image: "united-states.png" }, // correct
+          { country: "Russia", image: "russia.png" },
+          { country: "Germany", image: "germany.png" }
         ],
         correctIndex: 1,
         explanation: "The United States leads the world in number of billionaires, driven by tech, finance and other industries."
@@ -554,165 +368,198 @@
         id: 16,
         text: "Which country among the following has one of the lowest minimum wages (in HKD terms)?",
         options: [
-          { country: "Australia", img: "australia.png" },
-          { country: "United Kingdom", img: "united-kingdom.png" },
-          { country: "Philippines", img: "philippines.png" }, // correct
-          { country: "Hong Kong", img: "hong-kong.png" }
+          { country: "United States", image: "united-states.png" },
+          { country: "United Kingdom", image: "united-kingdom.png" },
+          { country: "Philippines", image: "philippines.png" }, // correct
+          { country: "Australia", image: "australia.png" }
         ],
         correctIndex: 2,
         explanation: "The Philippines has a much lower statutory minimum wage than the other countries listed, when converted into HKD."
       }
     ];
 
-    // ------------ DOM ELEMENTS ------------
+    // ----------------- DOM ELEMENTS -----------------
 
-    const introScreen = document.getElementById("intro-screen");
+    const startScreen = document.getElementById("start-screen");
+    const instructionScreen = document.getElementById("instruction-screen");
     const gameScreen = document.getElementById("game-screen");
-    const questionTextEl = document.getElementById("question-text");
-    const questionCounterEl = document.getElementById("question-counter");
-    const scoreDisplayEl = document.getElementById("score-display");
     const gameArea = document.getElementById("game-area");
     const basket = document.getElementById("basket");
-    const optionsLegendEl = document.getElementById("options-legend");
+    const questionTextEl = document.getElementById("question-text");
+    const scoreDisplayEl = document.getElementById("score-display");
     const messageEl = document.getElementById("message");
-    const resultScreen = document.getElementById("result-screen");
+
+    const resultOverlay = document.getElementById("result-overlay");
     const resultTitleEl = document.getElementById("result-title");
     const resultDetailEl = document.getElementById("result-detail");
     const giftMessageEl = document.getElementById("gift-message");
-    const bgMusicEl = document.getElementById("bg-music");
 
-    let currentQuestions = [];
+    const toInstructionBtn = document.getElementById("to-instruction");
+    const playAgainBtn = document.getElementById("play-again");
+    const backToStartBtn = document.getElementById("back-to-start");
+
+    // ----------------- GAME STATE -----------------
+
     let currentIndex = 0;
     let score = 0;
     let fallingFlags = [];
+    let animationInterval = null;
     let questionActive = false;
     let basketX = 0;
-    let animationInterval = null;
-    let dragging = false;
+    let gameRunning = false;
+
+    // Background music (you must upload images/background-music.mp3)
+    const bgMusic = new Audio("images/background-music.mp3");
+    bgMusic.loop = true;
+    bgMusic.volume = 0.3;
+
+    // Web Audio for short SFX (correct / wrong / celebration)
     let audioCtx = null;
 
-    function initAudioContext() {
+    function ensureAudioContext() {
       if (!audioCtx) {
         const AC = window.AudioContext || window.webkitAudioContext;
-        if (AC) audioCtx = new AC();
+        if (AC) {
+          audioCtx = new AC();
+        }
       }
     }
 
-    // ------------ GAME STATE ------------
-
-    function resetGameState() {
-      clearInterval(animationInterval);
-      animationInterval = null;
-      currentIndex = 0;
-      score = 0;
-      fallingFlags.forEach(f => {
-        if (f.el && f.el.parentNode) f.el.parentNode.removeChild(f.el);
-      });
-      fallingFlags = [];
-      questionActive = false;
-      messageEl.textContent = "";
-      optionsLegendEl.textContent = "";
-      resultScreen.style.display = "none";
-      updateScoreDisplay();
+    function playTone(freqStart, freqEnd, duration, type = "sine") {
+      try {
+        ensureAudioContext();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        const now = audioCtx.currentTime;
+        osc.frequency.setValueAtTime(freqStart, now);
+        osc.frequency.linearRampToValueAtTime(freqEnd, now + duration);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + duration);
+      } catch (e) {
+        // ignore
+      }
     }
 
-    function startGame(setNumber) {
-      resetGameState();
-      currentQuestions = setNumber === 1 ? SET1_QUESTIONS : SET2_QUESTIONS;
+    function playCorrectSound() {
+      playTone(600, 1000, 0.25, "triangle");
+    }
 
-      introScreen.style.display = "none";
+    function playWrongSound() {
+      playTone(220, 100, 0.25, "sawtooth");
+    }
+
+    function playCelebrationSound() {
+      playTone(700, 1200, 0.3, "square");
+      setTimeout(() => playTone(500, 900, 0.3, "square"), 250);
+    }
+
+    // ----------------- GAME FLOW -----------------
+
+    function resetGame() {
+      currentIndex = 0;
+      score = 0;
+      updateScoreDisplay();
+      messageEl.textContent = "";
+      messageEl.className = "";
+      resultOverlay.style.display = "none";
+      clearInterval(animationInterval);
+      animationInterval = null;
+      removeAllFlags();
+      questionActive = false;
+      gameRunning = true;
+      centerBasket();
+    }
+
+    function startGame() {
+      resetGame();
       gameScreen.style.display = "block";
+      instructionScreen.style.display = "none";
+      startScreen.style.display = "none";
 
-      // centre basket
-      setTimeout(() => {
-        const areaWidth = gameArea.clientWidth;
-        basketX = (areaWidth - basket.offsetWidth) / 2;
-        updateBasketPosition();
-      }, 0);
+      // try start music (user already tapped/clicked)
+      bgMusic.currentTime = 0;
+      bgMusic.play().catch(() => {});
 
-      playBackgroundMusic();
       loadQuestion();
     }
 
     function updateScoreDisplay() {
-      scoreDisplayEl.textContent = `Correct: ${score}`;
+      scoreDisplayEl.textContent = "Correct: " + score;
     }
 
     function loadQuestion() {
       clearInterval(animationInterval);
       animationInterval = null;
-
-      fallingFlags.forEach(f => {
-        if (f.el && f.el.parentNode) f.el.parentNode.removeChild(f.el);
-      });
-      fallingFlags = [];
-      optionsLegendEl.textContent = "";
+      removeAllFlags();
       messageEl.textContent = "";
       messageEl.className = "";
 
-      if (currentIndex >= currentQuestions.length) {
+      if (currentIndex >= QUESTIONS.length) {
         endGame();
         return;
       }
 
-      const q = currentQuestions[currentIndex];
+      const q = QUESTIONS[currentIndex];
+      questionTextEl.textContent = q.text;
       questionActive = true;
 
-      questionCounterEl.textContent = `Question ${currentIndex + 1} / ${currentQuestions.length}`;
-      questionTextEl.textContent = q.text;
+      const areaRect = gameArea.getBoundingClientRect();
+      const areaWidth = areaRect.width;
+      const areaHeight = areaRect.height;
 
-      // Legend
-      q.options.forEach(opt => {
-        const span = document.createElement("span");
-        span.className = "legend-item";
-        const img = document.createElement("img");
-        img.src = imgPath(opt.img);
-        img.alt = opt.country;
-        span.appendChild(img);
-        const text = document.createTextNode(" " + opt.country);
-        span.appendChild(text);
-        optionsLegendEl.appendChild(span);
-      });
-
-      // Create falling flags
-      const areaWidth = gameArea.clientWidth;
-      const areaHeight = gameArea.clientHeight;
+      fallingFlags = [];
+      const laneCount = q.options.length;
+      const laneWidth = areaWidth / (laneCount + 1);
 
       q.options.forEach((opt, index) => {
-        const wrapper = document.createElement("div");
-        wrapper.className = "flag";
         const img = document.createElement("img");
-        img.src = imgPath(opt.img);
-        img.alt = opt.country;
-        wrapper.appendChild(img);
-        gameArea.appendChild(wrapper);
+        img.className = "flag";
+        img.src = "images/" + opt.image;
+        gameArea.appendChild(img);
 
-        const flagWidth = 70;
-        // Extra spacing between flags
-        const x = Math.random() * (areaWidth - flagWidth - 30) + 15;
-        const speed = 1 + Math.random() * 1.2;
+        const laneCenterX = laneWidth * (index + 1);
+        const offset = (Math.random() - 0.5) * (laneWidth * 0.4);
+        const x = laneCenterX + offset;
 
-        wrapper.style.left = x + "px";
-        wrapper.style.top = "-80px";
+        const speed = 1.2 + Math.random() * 1.0;
+
+        img.style.left = x + "px";
+        img.style.top = "-80px";
 
         fallingFlags.push({
-          el: wrapper,
+          el: img,
           x,
           y: -80,
           speed,
-          isCorrect: index === q.correctIndex,
-          option: opt
+          isCorrect: index === q.correctIndex
         });
       });
 
       animationInterval = setInterval(() => {
-        const areaHeightNow = gameArea.clientHeight;
-        updateFlags(areaHeightNow);
+        updateFlags();
       }, 30);
     }
 
-    function updateFlags(areaHeight) {
+    function removeAllFlags() {
+      fallingFlags.forEach(f => {
+        if (f.el && f.el.parentNode) {
+          f.el.parentNode.removeChild(f.el);
+        }
+      });
+      fallingFlags = [];
+    }
+
+    function updateFlags() {
       if (!questionActive) return;
+
+      const areaRect = gameArea.getBoundingClientRect();
+      const areaHeight = areaRect.height;
 
       const basketRect = basket.getBoundingClientRect();
 
@@ -721,33 +568,36 @@
         flag.el.style.top = flag.y + "px";
 
         const flagRect = flag.el.getBoundingClientRect();
-        if (isIntersecting(basketRect, flagRect) && questionActive) {
+        if (rectsIntersect(basketRect, flagRect) && questionActive) {
           handleFlagCaught(flag);
         }
       });
 
-      // Remove flags that fall out
       fallingFlags = fallingFlags.filter(flag => {
-        if (flag.y > areaHeight + 20) {
-          if (flag.el && flag.el.parentNode) flag.el.parentNode.removeChild(flag.el);
+        if (flag.y > areaHeight + 40) {
+          if (flag.el && flag.el.parentNode) {
+            flag.el.parentNode.removeChild(flag.el);
+          }
           return false;
         }
         return true;
       });
 
-      // If all flags gone and still active -> move on
       if (fallingFlags.length === 0 && questionActive) {
         questionActive = false;
-        messageEl.textContent = "The flags disappeared! No answer for this question.";
+        messageEl.textContent = "⏳ Time for this question is over. Watch the explanation!";
         messageEl.className = "wrong";
+        const q = QUESTIONS[currentIndex];
+        const correctOpt = q.options[q.correctIndex];
+        messageEl.textContent = `The correct answer was ${correctOpt.country}. ${q.explanation}`;
         setTimeout(() => {
           currentIndex++;
           loadQuestion();
-        }, 2200);
+        }, 3000);
       }
     }
 
-    function isIntersecting(r1, r2) {
+    function rectsIntersect(r1, r2) {
       return !(
         r1.right < r2.left ||
         r1.left > r2.right ||
@@ -757,80 +607,106 @@
     }
 
     function handleFlagCaught(flag) {
+      if (!questionActive) return;
       questionActive = false;
       clearInterval(animationInterval);
       animationInterval = null;
 
-      const q = currentQuestions[currentIndex];
-      const correctOption = q.options[q.correctIndex];
+      const q = QUESTIONS[currentIndex];
+      const correctOpt = q.options[q.correctIndex];
 
       if (flag.isCorrect) {
         score++;
         updateScoreDisplay();
         messageEl.textContent = "✅ Correct! " + q.explanation;
         messageEl.className = "correct";
-        playAnswerSound(true);
+        playCorrectSound();
       } else {
-        messageEl.textContent =
-          `❌ Not quite. The correct flag was ${correctOption.country}. ` + q.explanation;
+        messageEl.textContent = `❌ Not quite. The correct answer was ${correctOpt.country}. ${q.explanation}`;
         messageEl.className = "wrong";
-        playAnswerSound(false);
+        playWrongSound();
       }
 
-      // remove remaining flags
       setTimeout(() => {
-        fallingFlags.forEach(f => {
-          if (f.el && f.el.parentNode) f.el.parentNode.removeChild(f.el);
-        });
-        fallingFlags = [];
-      }, 300);
-
-      // give students a few seconds to read the explanation
-      setTimeout(() => {
+        removeAllFlags();
         currentIndex++;
         loadQuestion();
-      }, 2600);
+      }, 3200); // a bit longer so students can read
     }
 
     function endGame() {
+      gameRunning = false;
       questionActive = false;
       clearInterval(animationInterval);
       animationInterval = null;
+      removeAllFlags();
 
-      resultScreen.style.display = "block";
+      const total = QUESTIONS.length;
+      resultDetailEl.textContent = `You answered ${score} out of ${total} questions correctly.`;
+
       if (score >= 3) {
+        giftMessageEl.textContent = "🎁 You win a small gift!";
         resultTitleEl.textContent = "CONGRATULATIONS!";
-        resultDetailEl.textContent = `You answered ${score} out of ${currentQuestions.length} questions correctly.`;
-        giftMessageEl.textContent = "🎁 You win a small gift! Please collect it from the booth staff.";
-        playApplause();
-        launchConfetti();
+        playCelebrationSound();
       } else {
-        resultTitleEl.textContent = "Good Try!";
-        resultDetailEl.textContent = `You answered ${score} out of ${currentQuestions.length} questions correctly.`;
         giftMessageEl.textContent = "Keep trying! Get 3 or more correct next time to win a gift.";
+        resultTitleEl.textContent = "GOOD EFFORT!";
       }
+
+      resultOverlay.style.display = "flex";
     }
 
-    // ------------ BASKET MOVEMENT ------------
+    // ----------------- BASKET CONTROL -----------------
+
+    function centerBasket() {
+      const areaRect = gameArea.getBoundingClientRect();
+      const areaWidth = areaRect.width;
+      const basketWidth = basket.offsetWidth || 110;
+      basketX = (areaWidth - basketWidth) / 2;
+      updateBasketPosition();
+    }
 
     function updateBasketPosition() {
-      const areaWidth = gameArea.clientWidth;
-      const maxX = areaWidth - basket.offsetWidth - 4;
-      if (basketX < 4) basketX = 4;
+      const areaRect = gameArea.getBoundingClientRect();
+      const areaWidth = areaRect.width;
+      const basketWidth = basket.offsetWidth || 110;
+      const minX = 10;
+      const maxX = areaWidth - basketWidth - 10;
+      if (basketX < minX) basketX = minX;
       if (basketX > maxX) basketX = maxX;
       basket.style.left = basketX + "px";
     }
 
-    function moveBasketToClientX(clientX) {
-      const rect = gameArea.getBoundingClientRect();
-      const relativeX = clientX - rect.left;
-      basketX = relativeX - basket.offsetWidth / 2;
+    function setBasketFromClientX(clientX) {
+      const areaRect = gameArea.getBoundingClientRect();
+      const basketWidth = basket.offsetWidth || 110;
+      const relativeX = clientX - areaRect.left - basketWidth / 2;
+      basketX = relativeX;
       updateBasketPosition();
     }
 
-    // Keyboard backup
+    // Mouse move inside game area
+    gameArea.addEventListener("mousemove", (e) => {
+      if (!gameRunning) return;
+      setBasketFromClientX(e.clientX);
+    });
+
+    // Touch controls for iPad / phones
+    function handleTouch(e) {
+      if (!gameRunning) return;
+      const touch = e.touches[0];
+      if (!touch) return;
+      e.preventDefault();
+      setBasketFromClientX(touch.clientX);
+    }
+
+    gameArea.addEventListener("touchstart", handleTouch, { passive: false });
+    gameArea.addEventListener("touchmove", handleTouch, { passive: false });
+
+    // Keyboard as backup
     window.addEventListener("keydown", (e) => {
-      const step = 26;
+      if (!gameRunning) return;
+      const step = 30;
       if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
         basketX -= step;
         updateBasketPosition();
@@ -840,153 +716,42 @@
       }
     });
 
-    // Mouse controls
-    gameArea.addEventListener("mousedown", (e) => {
-      dragging = true;
-      moveBasketToClientX(e.clientX);
+    // ----------------- SCREEN BUTTONS -----------------
+
+    toInstructionBtn.addEventListener("click", () => {
+      startScreen.style.display = "none";
+      instructionScreen.style.display = "flex";
     });
 
-    window.addEventListener("mouseup", () => {
-      dragging = false;
-    });
-
-    gameArea.addEventListener("mousemove", (e) => {
-      if (dragging) {
-        moveBasketToClientX(e.clientX);
-      }
-    });
-
-    // Touch controls (iPad)
-    gameArea.addEventListener("touchstart", (e) => {
-      dragging = true;
-      const touch = e.touches[0];
-      moveBasketToClientX(touch.clientX);
+    // Tap / click anywhere on instruction screen to start game
+    function instructionStartHandler(e) {
       e.preventDefault();
-    }, { passive: false });
-
-    gameArea.addEventListener("touchmove", (e) => {
-      if (!dragging) return;
-      const touch = e.touches[0];
-      moveBasketToClientX(touch.clientX);
-      e.preventDefault();
-    }, { passive: false });
-
-    window.addEventListener("touchend", () => {
-      dragging = false;
-    });
-
-    // ------------ SOUND ------------
-
-    function playBackgroundMusic() {
-      if (!bgMusicEl) return;
-      bgMusicEl.volume = 0.45;
-      const p = bgMusicEl.play();
-      if (p && p.catch) {
-        p.catch(() => {
-          // autoplay might be blocked; ignore
-        });
-      }
+      startGame();
     }
 
-    function stopBackgroundMusic() {
-      if (!bgMusicEl) return;
-      bgMusicEl.pause();
-      bgMusicEl.currentTime = 0;
-    }
+    instructionScreen.addEventListener("click", instructionStartHandler);
+    instructionScreen.addEventListener("touchstart", instructionStartHandler, { passive: false });
 
-    function playAnswerSound(isCorrect) {
-      initAudioContext();
-      if (!audioCtx) return;
-
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      if (isCorrect) {
-        osc.type = "triangle";
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-      } else {
-        osc.type = "sawtooth";
-        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-      }
-
-      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.28);
-    }
-
-    function playApplause() {
-      initAudioContext();
-      if (!audioCtx) return;
-
-      // Simple "applause-like" burst using noise
-      const bufferSize = audioCtx.sampleRate * 0.7;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
-      }
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
-
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.7);
-
-      noise.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      noise.start();
-      noise.stop(audioCtx.currentTime + 0.7);
-    }
-
-    // ------------ CONFETTI ------------
-
-    function launchConfetti() {
-      const count = 80;
-      for (let i = 0; i < count; i++) {
-        const c = document.createElement("div");
-        c.className = "confetti";
-        const colors = ["#f97316","#22c55e","#0ea5e9","#e11d48","#a855f7","#facc15"];
-        c.style.background = colors[Math.floor(Math.random()*colors.length)];
-        c.style.left = Math.random() * 100 + "%";
-        c.style.animationDelay = (Math.random()*0.4) + "s";
-        c.style.transform = `translateY(0) rotate(${Math.random()*180}deg)`;
-        resultScreen.appendChild(c);
-        setTimeout(() => {
-          if (c.parentNode) c.parentNode.removeChild(c);
-        }, 2000);
-      }
-    }
-
-    // ------------ BUTTON EVENTS ------------
-
-    document.getElementById("start-set-1").addEventListener("click", () => {
-      startGame(1);
+    playAgainBtn.addEventListener("click", () => {
+      resultOverlay.style.display = "none";
+      startGame();
     });
 
-    document.getElementById("start-set-2").addEventListener("click", () => {
-      startGame(2);
-    });
-
-    document.getElementById("play-again-set1").addEventListener("click", () => {
-      startGame(1);
-    });
-
-    document.getElementById("play-again-set2").addEventListener("click", () => {
-      startGame(2);
-    });
-
-    document.getElementById("back-to-intro").addEventListener("click", () => {
-      clearInterval(animationInterval);
-      animationInterval = null;
-      stopBackgroundMusic();
-      introScreen.style.display = "block";
+    backToStartBtn.addEventListener("click", () => {
+      resultOverlay.style.display = "none";
       gameScreen.style.display = "none";
+      startScreen.style.display = "flex";
+      instructionScreen.style.display = "none";
+      bgMusic.pause();
+    });
+
+    // Center basket once layout is ready
+    window.addEventListener("load", () => {
+      centerBasket();
+    });
+
+    window.addEventListener("resize", () => {
+      centerBasket();
     });
   </script>
 </body>
