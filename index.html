@@ -386,7 +386,7 @@
 
   {
     id: 11,
-    text: "Which countries often has the highest Big Mac prices?",
+    text: "Which country often has one of the highest Big Mac prices?",
     options: [
       { country: "🇨🇭 Switzerland", file: "switzerland.png" }, // correct
       { country: "🇩🇪 Germany", file: "germany.png" },
@@ -550,7 +550,7 @@
         const flagWidth = el.offsetWidth || 140;
         const margin = 40;
         const x = Math.random() * (areaWidth - flagWidth - margin * 2) + margin;
-        const speed = 1.2 + Math.random() * 1.2;
+        const speed = 1 + Math.random() * 1;
 
         el.style.left = x + "px";
         el.style.top = "-160px";
